@@ -102,6 +102,7 @@ CREATE POLICY memberships_insert_self ON memberships
   TO authenticated
   WITH CHECK (
     user_id = auth.uid()
+    AND email = (auth.jwt() ->> 'email')
     AND status = 'pending'
     AND role = 'student'
     AND student_eligibility = 'pending'
@@ -338,6 +339,8 @@ CREATE POLICY idempotency_keys_all ON idempotency_keys
   WITH CHECK (actor_id = auth.uid());
 
 -- 16. Least Privilege Role Grants
+GRANT USAGE ON SCHEMA public TO anon, authenticated;
+
 REVOKE ALL ON ALL TABLES IN SCHEMA public FROM anon;
 REVOKE ALL ON ALL TABLES IN SCHEMA public FROM authenticated;
 
@@ -362,6 +365,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON idempotency_keys TO authenticated;
 -- 17. Atomic Workflow Functions (RPC)
 CREATE OR REPLACE FUNCTION accept_exchange_request(
   p_transaction_id uuid,
+  p_expected_version integer DEFAULT NULL,
   p_idempotency_key text DEFAULT NULL
 )
 RETURNS jsonb
@@ -372,14 +376,39 @@ AS $$
 DECLARE
   v_actor_id uuid := auth.uid();
   v_tx transactions%ROWTYPE;
+  v_asset assets%ROWTYPE;
   v_start_tz timestamptz;
   v_end_tz timestamptz;
+  v_existing_idempotency idempotency_keys%ROWTYPE;
+  v_request_hash text;
+  v_response jsonb;
 BEGIN
   IF v_actor_id IS NULL THEN
     RAISE EXCEPTION 'Unauthorized: must be authenticated' USING ERRCODE = '42501';
   END IF;
 
-  -- Lock transaction for update
+  -- Compute request hash for idempotency
+  v_request_hash := md5(p_transaction_id::text || ':' || coalesce(p_expected_version::text, 'none'));
+
+  -- Idempotency check: if key already used, return recorded response or error on conflict
+  IF p_idempotency_key IS NOT NULL AND p_idempotency_key <> '' THEN
+    SELECT * INTO v_existing_idempotency
+    FROM idempotency_keys
+    WHERE actor_id = v_actor_id
+      AND operation = 'accept_exchange_request'
+      AND key = p_idempotency_key;
+
+    IF FOUND THEN
+      IF v_existing_idempotency.request_hash = v_request_hash THEN
+        RETURN v_existing_idempotency.response;
+      ELSE
+        RAISE EXCEPTION 'Idempotency conflict: key % reused with different payload', p_idempotency_key
+          USING ERRCODE = '23505';
+      END IF;
+    END IF;
+  END IF;
+
+  -- Lock transaction row for update
   SELECT * INTO v_tx
   FROM transactions
   WHERE id = p_transaction_id
@@ -397,20 +426,52 @@ BEGIN
     RAISE EXCEPTION 'Invalid transition: transaction is already in state %', v_tx.status USING ERRCODE = '22023';
   END IF;
 
-  -- For loan/rental, compute reservation range and insert into reservations
+  -- Staleness check against expected version
+  IF p_expected_version IS NOT NULL AND v_tx.version <> p_expected_version THEN
+    RAISE EXCEPTION 'Conflict: stale version (expected %, current %)', p_expected_version, v_tx.version
+      USING ERRCODE = '40001';
+  END IF;
+
+  -- Lock the asset row to serialize concurrent booking decisions on this item
+  SELECT * INTO v_asset
+  FROM assets
+  WHERE id = v_tx.asset_id
+  FOR UPDATE;
+
+  -- For loan/rental, compute reservation range with 1-hour turnaround buffer
+  -- Stored as half-open interval [start, end)
   IF v_tx.mode IN ('free_loan', 'rental') THEN
     v_start_tz := (v_tx.start_date::text || ' 00:00:00+00')::timestamptz;
-    v_end_tz := (v_tx.end_date::text || ' 23:59:59+00')::timestamptz;
+    -- Scheduled end + 1-hour turnaround buffer
+    v_end_tz := (v_tx.end_date::text || ' 23:59:59+00')::timestamptz + interval '1 hour';
 
     -- Inserting into reservations triggers the exclusion constraint
     -- 'no_overlapping_active_reservations' if another active reservation overlaps
     INSERT INTO reservations (transaction_id, asset_id, reservation_period, status)
-    VALUES (v_tx.id, v_tx.asset_id, tstzrange(v_start_tz, v_end_tz, '[]'), 'active');
+    VALUES (v_tx.id, v_tx.asset_id, tstzrange(v_start_tz, v_end_tz, '[)'), 'active');
+
   ELSIF v_tx.mode = 'sale' THEN
+    -- Sale acceptance requires the asset has NO other active reservations
+    IF EXISTS (
+      SELECT 1 FROM reservations
+      WHERE asset_id = v_tx.asset_id AND status = 'active'
+    ) THEN
+      RAISE EXCEPTION 'Conflict: asset has active reservations and cannot be sold'
+        USING ERRCODE = '23P01';
+    END IF;
+
+    -- For sale, reserve from now indefinitely
     INSERT INTO reservations (transaction_id, asset_id, reservation_period, status)
-    VALUES (v_tx.id, v_tx.asset_id, tstzrange(now(), 'infinity'::timestamptz, '[]'), 'active');
+    VALUES (v_tx.id, v_tx.asset_id, tstzrange(now(), 'infinity'::timestamptz, '[)'), 'active');
     
     UPDATE assets SET status = 'in_exchange' WHERE id = v_tx.asset_id;
+
+    -- Atomically decline competing pending requests for this asset
+    UPDATE transactions
+    SET status = 'declined', version = version + 1
+    WHERE asset_id = v_tx.asset_id
+      AND id <> p_transaction_id
+      AND status = 'requested';
   END IF;
 
   -- Update transaction status to accepted
@@ -426,7 +487,7 @@ BEGIN
     'transaction.accepted',
     'transaction',
     v_tx.id,
-    jsonb_build_object('mode', v_tx.mode, 'requester_id', v_tx.requester_id)
+    jsonb_build_object('mode', v_tx.mode, 'requester_id', v_tx.requester_id, 'version', v_tx.version + 1)
   );
 
   -- Record outbox event for notifications
@@ -436,9 +497,31 @@ BEGIN
     jsonb_build_object('transaction_id', v_tx.id, 'owner_id', v_actor_id, 'requester_id', v_tx.requester_id)
   );
 
-  RETURN jsonb_build_object('success', true, 'transaction_id', v_tx.id, 'status', 'accepted');
+  v_response := jsonb_build_object(
+    'success', true,
+    'transaction_id', v_tx.id,
+    'status', 'accepted',
+    'version', v_tx.version + 1
+  );
+
+  -- Record idempotency outcome if key provided
+  IF p_idempotency_key IS NOT NULL AND p_idempotency_key <> '' THEN
+    INSERT INTO idempotency_keys (actor_id, operation, key, request_hash, response, expires_at)
+    VALUES (
+      v_actor_id,
+      'accept_exchange_request',
+      p_idempotency_key,
+      v_request_hash,
+      v_response,
+      now() + interval '24 hours'
+    );
+  END IF;
+
+  RETURN v_response;
 END;
 $$;
 
-GRANT EXECUTE ON FUNCTION accept_exchange_request(uuid, text) TO authenticated;
+-- Revoke execute from PUBLIC and anon, grant only to authenticated
+REVOKE EXECUTE ON FUNCTION accept_exchange_request(uuid, integer, text) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION accept_exchange_request(uuid, integer, text) TO authenticated;
 
