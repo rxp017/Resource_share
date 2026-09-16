@@ -13,6 +13,13 @@ import {
 import { ThemeProvider } from './shared/theme';
 import { AppLayout } from './shared/layout/AppLayout';
 import { OnboardingPage, SettingsPage, OnboardingGuard } from './modules/preferences';
+import {
+  ExplorePage,
+  CreateListingPage,
+  ListingDetailPage,
+  MyListingsPage,
+  ModerationQueuePage,
+} from './modules/listings';
 import { PublicLandingPage } from './modules/landing/PublicLandingPage';
 import { UnavailableState } from './shared/components/UnavailableState';
 
@@ -53,31 +60,9 @@ export const App: React.FC = () => {
                       <Route path="/settings" element={<SettingsPage />} />
 
                       {/* Explore & Listings Feed */}
-                      <Route
-                        path="/explore"
-                        element={
-                          <div style={{ padding: '24px' }}>
-                            <h2 style={{ fontSize: '1.5rem', marginBottom: '8px' }}>Explore Feed</h2>
-                            <p style={{ color: 'var(--color-text-muted)' }}>Welcome to the HITAM campus marketplace.</p>
-                          </div>
-                        }
-                      />
-                      <Route
-                        path="/listings/new"
-                        element={
-                          <div style={{ padding: '24px' }}>
-                            <h2>Create Listing</h2>
-                          </div>
-                        }
-                      />
-                      <Route
-                        path="/listings/:id"
-                        element={
-                          <div style={{ padding: '24px' }}>
-                            <h2>Listing Detail</h2>
-                          </div>
-                        }
-                      />
+                      <Route path="/explore" element={<ExplorePage />} />
+                      <Route path="/listings/new" element={<CreateListingPage />} />
+                      <Route path="/listings/:id" element={<ListingDetailPage />} />
                       <Route
                         path="/listings/:id/request"
                         element={
@@ -86,14 +71,7 @@ export const App: React.FC = () => {
                           </div>
                         }
                       />
-                      <Route
-                        path="/my/listings"
-                        element={
-                          <div style={{ padding: '24px' }}>
-                            <h2>My Listings</h2>
-                          </div>
-                        }
-                      />
+                      <Route path="/my/listings" element={<MyListingsPage />} />
                       <Route
                         path="/exchanges"
                         element={
@@ -184,14 +162,7 @@ export const App: React.FC = () => {
 
                       {/* Operator / Moderator Queue */}
                       <Route element={<RequireModerator />}>
-                        <Route
-                          path="/admin/moderation"
-                          element={
-                            <div style={{ padding: '24px' }}>
-                              <h2>Moderation Queue</h2>
-                            </div>
-                          }
-                        />
+                        <Route path="/admin/moderation" element={<ModerationQueuePage />} />
                         <Route
                           path="/admin/members"
                           element={

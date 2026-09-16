@@ -151,3 +151,23 @@ Dependency chain: P00 -> P01 -> P02 -> P03 -> P04 -> P05 -> P06 -> P07 -> P08 ->
 | UX-10 | VERIFIED | Shared state components (`Skeleton`, `EmptyState`, `ErrorState`, `ForbiddenState`, `UnavailableState`) with honest deferred feature explanations. |
 | UX-11 | VERIFIED | Settings page enables account review, preference edits with atomic rollback on failure, and clean sign-out. |
 | **P04 Final Gate Status** | **CLOSED / VERIFIED** | Transition to S4 Early Cloudflare Pages Deployment |
+
+### P05 Exit-Gate Audit: Listings, Media, Search, Moderation (planning/04-GENERATOR-PROMPTS.md Phase P05)
+
+| Checklist ID | Status | Evidence / Notes |
+|---|---|---|
+| LST-01 | VERIFIED | Student can create draft, fill fields, select pickup zones, and submit listing (`CreateListingPage.tsx`, `E-026`). |
+| LST-02 | VERIFIED | Required category, condition, defect disclosure, mode, integer paise pricing, and pickup zones enforced in schema and client (`E-026`). |
+| LST-03 | VERIFIED | Prohibited academic and institutional items filtered and moderation queue available (`ModerationQueuePage.tsx`, `0004_p05_fixes.sql`). |
+| LST-04 | VERIFIED | Client HTML5 canvas image validation strips EXIF, rejects corrupt/oversized images, downsamples to max 1600px (`imageUtils.ts`). |
+| LST-05 | VERIFIED | Private `listing-photos` bucket storage policies enforced (`storage_policies = 2`), signed URLs resolved with time-bound access (`imageUtils.ts`). |
+| LST-06 | VERIFIED | Maximum 4 photos per listing limit enforced on client and storage level. |
+| LST-07 | VERIFIED | Storage path uses standard listing ID naming convention. |
+| LST-08 | VERIFIED | RLS hides non-published listings from general search; only published items visible to members (`0002_rls_and_policies.sql`, `E-021`). |
+| LST-09 | VERIFIED | ExplorePage with real-time text query, category pill filters, mode toggles, and dual price range sliders (`ExplorePage.tsx`). |
+| LST-10 | VERIFIED | Distinct price semantics: sale displays total integer paise; rental displays daily integer paise rate (`ListingCard.tsx`, `ListingDetailPage.tsx`). |
+| LST-11 | VERIFIED | Honest empty/no-results and loading skeleton states implemented per Calm/Pulse visual contract (`ExplorePage.tsx`). |
+| LST-12 | VERIFIED | Listing detail displays owner identity, condition, pickup zone, defect disclosure, and mode-appropriate exchange action CTA (`ListingDetailPage.tsx`). |
+| LST-13 | VERIFIED | MyListingsPage allows owner to pause/resume or archive listings with immediate UI state reflection (`MyListingsPage.tsx`). |
+| LST-14 | VERIFIED | Campus moderator/admin queue with approve, flag, archive actions using secure `moderate_listing` RPC (`moderate_listing_rpc = 1`, `ModerationQueuePage.tsx`). |
+| **P05 Final Gate Status** | **CLOSED / VERIFIED** | Transition to S6 Sale Requests & Private Payment Proof Workflow |
