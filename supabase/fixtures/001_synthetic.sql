@@ -1,228 +1,277 @@
 -- supabase/fixtures/001_synthetic.sql
 -- Ad hoc synthetic fixtures for development, testing, and P02 validation.
--- PREREQUISITE: Create three users in Supabase Dashboard (Authentication -> Users -> Add user, Auto-confirm ON):
---   1. studentA.test@hitam.org
---   2. studentB.test@hitam.org
---   3. studentC.test@hitam.org
+-- PREREQUISITE: The following 9 synthetic users must exist in Supabase Dashboard
+-- (Authentication -> Users -> Add user, with Auto-confirm User turned ON):
+--   1. studentA.test@hitam.org (Seller / Owner)
+--   2. studentB.test@hitam.org (Buyer / Requester)
+--   3. studentC.test@hitam.org (Observer / Concurrency requester)
+--   4. studentP.test@hitam.org (Pending member)
+--   5. studentS.test@hitam.org (Suspended member)
+--   6. studentX.test@hitam.org (Expired member)
+--   7. studentM.test@hitam.org (Assigned moderator on HITAM)
+--   8. studentU.test@hitam.org (Unassigned moderator)
+--   9. studentT.test@hitam.org (TESTCAMP member)
 
 DO $$
 DECLARE
   v_campus_hitam uuid;
   v_campus_testcamp uuid;
+
   v_user_a uuid;
   v_user_b uuid;
   v_user_c uuid;
-  v_mod_assigned uuid := '00000000-0000-0000-0000-000000000001'::uuid;
-  v_mod_unassigned uuid := '00000000-0000-0000-0000-000000000002'::uuid;
-  v_user_pending uuid := '00000000-0000-0000-0000-000000000003'::uuid;
-  v_user_suspended uuid := '00000000-0000-0000-0000-000000000004'::uuid;
-  v_user_expired uuid := '00000000-0000-0000-0000-000000000005'::uuid;
-  v_user_testcamp uuid := '00000000-0000-0000-0000-000000000006'::uuid;
+  v_user_p uuid;
+  v_user_s uuid;
+  v_user_x uuid;
+  v_user_m uuid;
+  v_user_u uuid;
+  v_user_t uuid;
 
-  v_asset_sale uuid := gen_random_uuid();
-  v_asset_rental1 uuid := gen_random_uuid();
-  v_asset_rental2 uuid := gen_random_uuid();
-  v_asset_free uuid := gen_random_uuid();
-  v_asset_draft uuid := gen_random_uuid();
-  v_asset_review uuid := gen_random_uuid();
-  v_asset_rejected uuid := gen_random_uuid();
-  v_asset_paused uuid := gen_random_uuid();
-  v_asset_hidden uuid := gen_random_uuid();
-  v_asset_hist uuid := gen_random_uuid();
+  -- Deterministic Asset UUIDs
+  v_asset_tx_sale uuid     := 'a0000000-0000-0000-0000-000000000001'::uuid;
+  v_asset_tx_rental uuid   := 'a0000000-0000-0000-0000-000000000002'::uuid;
+  v_asset_tx_hist uuid     := 'a0000000-0000-0000-0000-000000000003'::uuid;
+  v_asset_concurrency uuid := 'a0000000-0000-0000-0000-000000000004'::uuid;
+  v_asset_draft uuid       := 'a0000000-0000-0000-0000-000000000005'::uuid;
+  v_asset_review uuid      := 'a0000000-0000-0000-0000-000000000006'::uuid;
+  v_asset_rejected uuid    := 'a0000000-0000-0000-0000-000000000007'::uuid;
+  v_asset_paused uuid      := 'a0000000-0000-0000-0000-000000000008'::uuid;
+  v_asset_hidden uuid      := 'a0000000-0000-0000-0000-000000000009'::uuid;
 
-  v_listing_sale uuid := gen_random_uuid();
-  v_listing_rental1 uuid := gen_random_uuid();
-  v_listing_rental2 uuid := gen_random_uuid();
-  v_listing_free uuid := gen_random_uuid();
-  v_listing_draft uuid := gen_random_uuid();
-  v_listing_review uuid := gen_random_uuid();
-  v_listing_rejected uuid := gen_random_uuid();
-  v_listing_paused uuid := gen_random_uuid();
-  v_listing_hidden uuid := gen_random_uuid();
-  v_listing_hist uuid := gen_random_uuid();
+  -- Deterministic Listing UUIDs
+  v_listing_tx_sale uuid     := 'b0000000-0000-0000-0000-000000000001'::uuid;
+  v_listing_tx_rental uuid   := 'b0000000-0000-0000-0000-000000000002'::uuid;
+  v_listing_tx_hist uuid     := 'b0000000-0000-0000-0000-000000000003'::uuid;
+  v_listing_concurrency uuid := 'b0000000-0000-0000-0000-000000000004'::uuid;
+  v_listing_draft uuid       := 'b0000000-0000-0000-0000-000000000005'::uuid;
+  v_listing_review uuid      := 'b0000000-0000-0000-0000-000000000006'::uuid;
+  v_listing_rejected uuid    := 'b0000000-0000-0000-0000-000000000007'::uuid;
+  v_listing_paused uuid      := 'b0000000-0000-0000-0000-000000000008'::uuid;
+  v_listing_hidden uuid      := 'b0000000-0000-0000-0000-000000000009'::uuid;
 
-  v_tx_sale uuid := gen_random_uuid();
-  v_tx_rental uuid := gen_random_uuid();
-  v_tx_hist uuid := gen_random_uuid();
+  -- Deterministic Transaction UUIDs
+  v_tx_sale uuid   := 'c0000000-0000-0000-0000-000000000001'::uuid;
+  v_tx_rental uuid := 'c0000000-0000-0000-0000-000000000002'::uuid;
+  v_tx_hist uuid   := 'c0000000-0000-0000-0000-000000000003'::uuid;
+
+  -- Reservation range variables
+  v_start_tz timestamptz;
+  v_end_tz timestamptz;
+
 BEGIN
-  -- 1. Identify Campuses
+  -- 1. Identify Primary Campus (HITAM)
   SELECT id INTO v_campus_hitam FROM campuses WHERE code = 'HITAM' LIMIT 1;
   IF v_campus_hitam IS NULL THEN
-    RAISE EXCEPTION 'HITAM campus not found. Did you run 0001_schema.sql?';
+    RAISE EXCEPTION 'HITAM campus record not found. 0001_schema.sql must be applied first.' USING ERRCODE = 'P0002';
   END IF;
 
-  -- Create second synthetic campus TESTCAMP if absent
-  INSERT INTO campuses (code, name, domain, status, settings)
-  VALUES ('TESTCAMP', 'Test Synthetic Campus', 'testcamp.edu', 'active', '{}'::jsonb)
-  ON CONFLICT (code) DO UPDATE SET name = EXCLUDED.name
+  -- 2. Insert or Update Secondary Campus (TESTCAMP)
+  INSERT INTO campuses (code, name, status, timezone, allowed_domains, pickup_zones)
+  VALUES ('TESTCAMP', 'Test Synthetic Campus', 'active', 'Asia/Kolkata', ARRAY['testcamp.edu'], '[]'::jsonb)
+  ON CONFLICT (code) DO UPDATE
+    SET name = EXCLUDED.name,
+        status = EXCLUDED.status,
+        allowed_domains = EXCLUDED.allowed_domains,
+        pickup_zones = EXCLUDED.pickup_zones
   RETURNING id INTO v_campus_testcamp;
 
-  -- 2. Resolve Synthetic Auth Users
-  SELECT id INTO v_user_a FROM auth.users WHERE email = 'studentA.test@hitam.org';
-  SELECT id INTO v_user_b FROM auth.users WHERE email = 'studentB.test@hitam.org';
-  SELECT id INTO v_user_c FROM auth.users WHERE email = 'studentC.test@hitam.org';
+  -- 3. Resolve All 9 Synthetic Auth Users
+  SELECT id INTO v_user_a FROM auth.users WHERE lower(email) = 'studenta.test@hitam.org';
+  SELECT id INTO v_user_b FROM auth.users WHERE lower(email) = 'studentb.test@hitam.org';
+  SELECT id INTO v_user_c FROM auth.users WHERE lower(email) = 'studentc.test@hitam.org';
+  SELECT id INTO v_user_p FROM auth.users WHERE lower(email) = 'studentp.test@hitam.org';
+  SELECT id INTO v_user_s FROM auth.users WHERE lower(email) = 'students.test@hitam.org';
+  SELECT id INTO v_user_x FROM auth.users WHERE lower(email) = 'studentx.test@hitam.org';
+  SELECT id INTO v_user_m FROM auth.users WHERE lower(email) = 'studentm.test@hitam.org';
+  SELECT id INTO v_user_u FROM auth.users WHERE lower(email) = 'studentu.test@hitam.org';
+  SELECT id INTO v_user_t FROM auth.users WHERE lower(email) = 'studentt.test@hitam.org';
 
-  IF v_user_a IS NULL OR v_user_b IS NULL OR v_user_c IS NULL THEN
-    RAISE NOTICE 'WARNING: Synthetic auth users studentA/B/C not found in auth.users. Profiles and memberships for A/B/C will be created if auth users exist.';
+  IF v_user_a IS NULL OR v_user_b IS NULL OR v_user_c IS NULL OR
+     v_user_p IS NULL OR v_user_s IS NULL OR v_user_x IS NULL OR
+     v_user_m IS NULL OR v_user_u IS NULL OR v_user_t IS NULL THEN
+    RAISE EXCEPTION 'Missing synthetic auth users. Please ensure all 9 accounts exist in auth.users before running fixtures.';
   END IF;
 
-  -- Upsert synthetic profiles
-  IF v_user_a IS NOT NULL THEN
-    INSERT INTO profiles (id, display_name) VALUES (v_user_a, 'Student A (Seller)') ON CONFLICT (id) DO NOTHING;
-    INSERT INTO memberships (user_id, campus_id, email, status, role, student_eligibility)
-    VALUES (v_user_a, v_campus_hitam, 'studenta.test@hitam.org', 'active', 'student', 'eligible')
-    ON CONFLICT (user_id, campus_id) DO UPDATE SET status = 'active', student_eligibility = 'eligible';
-    INSERT INTO preferences (user_id) VALUES (v_user_a) ON CONFLICT (user_id) DO NOTHING;
-  END IF;
+  -- 4. Clean Up Prior Fixture Data Idempotently (order preserves FK constraints)
+  DELETE FROM reservations WHERE transaction_id IN (v_tx_sale, v_tx_rental, v_tx_hist);
+  DELETE FROM transactions WHERE id IN (v_tx_sale, v_tx_rental, v_tx_hist);
+  DELETE FROM listing_media WHERE listing_id IN (
+    v_listing_tx_sale, v_listing_tx_rental, v_listing_tx_hist, v_listing_concurrency,
+    v_listing_draft, v_listing_review, v_listing_rejected, v_listing_paused, v_listing_hidden
+  );
+  DELETE FROM listings WHERE id IN (
+    v_listing_tx_sale, v_listing_tx_rental, v_listing_tx_hist, v_listing_concurrency,
+    v_listing_draft, v_listing_review, v_listing_rejected, v_listing_paused, v_listing_hidden
+  );
+  DELETE FROM assets WHERE id IN (
+    v_asset_tx_sale, v_asset_tx_rental, v_asset_tx_hist, v_asset_concurrency,
+    v_asset_draft, v_asset_review, v_asset_rejected, v_asset_paused, v_asset_hidden
+  );
 
-  IF v_user_b IS NOT NULL THEN
-    INSERT INTO profiles (id, display_name) VALUES (v_user_b, 'Student B (Buyer)') ON CONFLICT (id) DO NOTHING;
-    INSERT INTO memberships (user_id, campus_id, email, status, role, student_eligibility)
-    VALUES (v_user_b, v_campus_hitam, 'studentb.test@hitam.org', 'active', 'student', 'eligible')
-    ON CONFLICT (user_id, campus_id) DO UPDATE SET status = 'active', student_eligibility = 'eligible';
-    INSERT INTO preferences (user_id) VALUES (v_user_b) ON CONFLICT (user_id) DO NOTHING;
-  END IF;
-
-  IF v_user_c IS NOT NULL THEN
-    INSERT INTO profiles (id, display_name) VALUES (v_user_c, 'Student C (Observer/Concurrent)') ON CONFLICT (id) DO NOTHING;
-    INSERT INTO memberships (user_id, campus_id, email, status, role, student_eligibility)
-    VALUES (v_user_c, v_campus_hitam, 'studentc.test@hitam.org', 'active', 'student', 'eligible')
-    ON CONFLICT (user_id, campus_id) DO UPDATE SET status = 'active', student_eligibility = 'eligible';
-    INSERT INTO preferences (user_id) VALUES (v_user_c) ON CONFLICT (user_id) DO NOTHING;
-  END IF;
-
-  -- Synthetic auxiliary profiles & memberships (fixtures)
+  -- 5. Upsert Profiles for all 9 users
   INSERT INTO profiles (id, display_name) VALUES
-    (v_mod_assigned, 'Mod Assigned (HITAM)'),
-    (v_mod_unassigned, 'Mod Unassigned (Global)'),
-    (v_user_pending, 'Pending Student'),
-    (v_user_suspended, 'Suspended Student'),
-    (v_user_expired, 'Expired Student'),
-    (v_user_testcamp, 'Testcamp Student')
-  ON CONFLICT (id) DO NOTHING;
+    (v_user_a, 'Student A (Seller)'),
+    (v_user_b, 'Student B (Buyer)'),
+    (v_user_c, 'Student C (Observer)'),
+    (v_user_p, 'Student P (Pending)'),
+    (v_user_s, 'Student S (Suspended)'),
+    (v_user_x, 'Student X (Expired)'),
+    (v_user_m, 'Student M (Moderator Assigned)'),
+    (v_user_u, 'Student U (Moderator Unassigned)'),
+    (v_user_t, 'Student T (TESTCAMP Member)')
+  ON CONFLICT (id) DO UPDATE SET display_name = EXCLUDED.display_name;
 
+  -- 6. Upsert Preferences for all 9 users
+  INSERT INTO preferences (user_id, style, appearance, motion, density) VALUES
+    (v_user_a, 'calm', 'system', 'system', 'comfortable'),
+    (v_user_b, 'pulse', 'system', 'system', 'comfortable'),
+    (v_user_c, 'calm', 'light', 'system', 'comfortable'),
+    (v_user_p, 'calm', 'system', 'system', 'comfortable'),
+    (v_user_s, 'calm', 'system', 'system', 'comfortable'),
+    (v_user_x, 'calm', 'system', 'system', 'comfortable'),
+    (v_user_m, 'calm', 'system', 'system', 'comfortable'),
+    (v_user_u, 'calm', 'system', 'system', 'comfortable'),
+    (v_user_t, 'calm', 'system', 'system', 'comfortable')
+  ON CONFLICT (user_id) DO NOTHING;
+
+  -- 7. Upsert Memberships for all 9 users
+  -- Note: memberships.email has valid_hitam_email CHECK constraint: ^[A-Za-z0-9._%+-]+@hitam\.org$
   INSERT INTO memberships (user_id, campus_id, email, status, role, student_eligibility) VALUES
-    (v_mod_assigned, v_campus_hitam, 'mod.assigned@hitam.org', 'active', 'moderator', 'eligible'),
-    (v_mod_unassigned, v_campus_hitam, 'mod.unassigned@hitam.org', 'active', 'moderator', 'eligible'),
-    (v_user_pending, v_campus_hitam, 'pending.fixture@hitam.org', 'pending', 'student', 'pending'),
-    (v_user_suspended, v_campus_hitam, 'suspended.fixture@hitam.org', 'suspended', 'student', 'eligible'),
-    (v_user_expired, v_campus_hitam, 'expired.fixture@hitam.org', 'expired', 'student', 'eligible'),
-    (v_user_testcamp, v_campus_testcamp, 'student@testcamp.edu', 'active', 'student', 'eligible')
-  ON CONFLICT (user_id, campus_id) DO NOTHING;
+    (v_user_a, v_campus_hitam, 'studenta.test@hitam.org', 'active', 'student', 'eligible'),
+    (v_user_b, v_campus_hitam, 'studentb.test@hitam.org', 'active', 'student', 'eligible'),
+    (v_user_c, v_campus_hitam, 'studentc.test@hitam.org', 'active', 'student', 'eligible'),
+    (v_user_p, v_campus_hitam, 'studentp.test@hitam.org', 'pending', 'student', 'pending'),
+    (v_user_s, v_campus_hitam, 'students.test@hitam.org', 'suspended', 'student', 'eligible'),
+    (v_user_x, v_campus_hitam, 'studentx.test@hitam.org', 'expired', 'student', 'eligible'),
+    (v_user_m, v_campus_hitam, 'studentm.test@hitam.org', 'active', 'moderator', 'eligible'),
+    (v_user_u, v_campus_hitam, 'studentu.test@hitam.org', 'active', 'moderator', 'eligible'),
+    (v_user_t, v_campus_testcamp, 'studentt.test@hitam.org', 'active', 'student', 'eligible')
+  ON CONFLICT (user_id, campus_id) DO UPDATE
+    SET email = EXCLUDED.email,
+        status = EXCLUDED.status,
+        role = EXCLUDED.role,
+        student_eligibility = EXCLUDED.student_eligibility;
 
-  -- 3. Listings across all statuses (owned by user_a if exists, else mod_assigned)
-  DECLARE
-    v_owner uuid := coalesce(v_user_a, v_mod_assigned);
-    v_buyer uuid := coalesce(v_user_b, v_user_c, v_mod_unassigned);
-  BEGIN
-    -- Asset & Listing: Published Sale
-    INSERT INTO assets (id, campus_id, owner_id, title, category, condition, status)
-    VALUES (v_asset_sale, v_campus_hitam, v_owner, 'Engineering Physics Textbook', 'textbooks', 'like_new', 'active');
-    INSERT INTO listings (id, asset_id, campus_id, owner_id, title, description, category, mode, price_paise, deposit_paise, pickup_zone, status)
-    VALUES (v_listing_sale, v_asset_sale, v_campus_hitam, v_owner, 'Engineering Physics Textbook', 'First year physics textbook in pristine condition.', 'textbooks', 'sale', 35000, 0, 'Library Ground Floor', 'published');
-    INSERT INTO listing_media (listing_id, storage_path, sort_order)
-    VALUES (v_listing_sale, 'listings/' || v_owner || '/' || v_listing_sale || '/0.jpg', 0);
+  -- 8. Assets & Listings Covering All Allowed Statuses
 
-    -- Asset & Listing: Published Rental 1
-    INSERT INTO assets (id, campus_id, owner_id, title, category, condition, status)
-    VALUES (v_asset_rental1, v_campus_hitam, v_owner, 'Casio FX-991EX Scientific Calculator', 'electronics', 'good', 'active');
-    INSERT INTO listings (id, asset_id, campus_id, owner_id, title, description, category, mode, price_paise, deposit_paise, pickup_zone, status)
-    VALUES (v_listing_rental1, v_asset_rental1, v_campus_hitam, v_owner, 'Casio FX-991EX Scientific Calculator', 'Ideal for semester exams. Daily rental.', 'electronics', 'rental', 5000, 20000, 'Academic Block Entrance', 'published');
-    INSERT INTO listing_media (listing_id, storage_path, sort_order)
-    VALUES (v_listing_rental1, 'listings/' || v_owner || '/' || v_listing_rental1 || '/0.jpg', 0);
+  -- (a) Accepted Sale Asset & Published Listing
+  INSERT INTO assets (id, campus_id, owner_id, title, description, status)
+  VALUES (v_asset_tx_sale, v_campus_hitam, v_user_a, 'Engineering Mathematics Handbook', 'Higher engineering math handbook.', 'in_exchange');
 
-    -- Asset & Listing: Published Rental 2 (For concurrency test)
-    INSERT INTO assets (id, campus_id, owner_id, title, category, condition, status)
-    VALUES (v_asset_rental2, v_campus_hitam, v_owner, 'Lab Apron & Safety Goggles', 'lab_gear', 'good', 'active');
-    INSERT INTO listings (id, asset_id, campus_id, owner_id, title, description, category, mode, price_paise, deposit_paise, pickup_zone, status)
-    VALUES (v_listing_rental2, v_asset_rental2, v_campus_hitam, v_owner, 'Lab Apron & Safety Goggles', 'Clean white apron size L with goggles.', 'lab_gear', 'rental', 3000, 10000, 'Chemistry Lab Porch', 'published');
-    INSERT INTO listing_media (listing_id, storage_path, sort_order)
-    VALUES (v_listing_rental2, 'listings/' || v_owner || '/' || v_listing_rental2 || '/0.jpg', 0);
+  INSERT INTO listings (id, asset_id, campus_id, owner_id, title, description, category, condition, defects, mode, price_paise, deposit_paise, pickup_zone, status)
+  VALUES (v_listing_tx_sale, v_asset_tx_sale, v_campus_hitam, v_user_a, 'Engineering Mathematics Handbook', 'Comprehensive handbook for sem 1 and 2.', 'textbooks', 'like_new', '', 'sale', 35000, 0, 'Library Entrance', 'published');
 
-    -- Asset & Listing: Published Free Loan
-    INSERT INTO assets (id, campus_id, owner_id, title, category, condition, status)
-    VALUES (v_asset_free, v_campus_hitam, v_owner, 'Drafter & Drawing Board', 'drafting', 'fair', 'active');
-    INSERT INTO listings (id, asset_id, campus_id, owner_id, title, description, category, mode, price_paise, deposit_paise, pickup_zone, status)
-    VALUES (v_listing_free, v_asset_free, v_campus_hitam, v_owner, 'Drafter & Drawing Board', 'Free loan for drawing assignments. Please return safely.', 'drafting', 'free_loan', 0, 0, 'Design Studio 204', 'published');
-    INSERT INTO listing_media (listing_id, storage_path, sort_order)
-    VALUES (v_listing_free, 'listings/' || v_owner || '/' || v_listing_free || '/0.jpg', 0);
+  INSERT INTO listing_media (listing_id, storage_path, sort_order)
+  VALUES (v_listing_tx_sale, 'listings/' || v_user_a || '/' || v_listing_tx_sale || '/0.jpg', 0);
 
-    -- Asset & Listing: Draft
-    INSERT INTO assets (id, campus_id, owner_id, title, category, condition, status)
-    VALUES (v_asset_draft, v_campus_hitam, v_owner, 'Draft Raspberry Pi 4 Kit', 'electronics', 'good', 'active');
-    INSERT INTO listings (id, asset_id, campus_id, owner_id, title, description, category, mode, price_paise, deposit_paise, pickup_zone, status)
-    VALUES (v_listing_draft, v_asset_draft, v_campus_hitam, v_owner, 'Draft Raspberry Pi 4 Kit', 'Draft description', 'electronics', 'sale', 450000, 0, 'Canteen Area', 'draft');
+  -- (b) Accepted Rental Asset & Published Listing
+  INSERT INTO assets (id, campus_id, owner_id, title, description, status)
+  VALUES (v_asset_tx_rental, v_campus_hitam, v_user_a, 'Casio FX-991EX ClassWiz Calculator', 'Advanced scientific calculator.', 'active');
 
-    -- Asset & Listing: Pending Review
-    INSERT INTO assets (id, campus_id, owner_id, title, category, condition, status)
-    VALUES (v_asset_review, v_campus_hitam, v_owner, 'Pending Review Drone Kit', 'electronics', 'like_new', 'active');
-    INSERT INTO listings (id, asset_id, campus_id, owner_id, title, description, category, mode, price_paise, deposit_paise, pickup_zone, status)
-    VALUES (v_listing_review, v_asset_review, v_campus_hitam, v_owner, 'Pending Review Drone Kit', 'Awaiting moderation review', 'electronics', 'sale', 800000, 0, 'Tech Park Gate', 'pending_review');
+  INSERT INTO listings (id, asset_id, campus_id, owner_id, title, description, category, condition, defects, mode, price_paise, deposit_paise, pickup_zone, status)
+  VALUES (v_listing_tx_rental, v_asset_tx_rental, v_campus_hitam, v_user_a, 'Casio FX-991EX ClassWiz Calculator', 'Available for daily or weekly rental during exam prep.', 'electronics', 'good', '', 'rental', 5000, 20000, 'Main Gate Reception', 'published');
 
-    -- Asset & Listing: Rejected
-    INSERT INTO assets (id, campus_id, owner_id, title, category, condition, status)
-    VALUES (v_asset_rejected, v_campus_hitam, v_owner, 'Rejected Non-Compliant Item', 'notes', 'poor', 'active');
-    INSERT INTO listings (id, asset_id, campus_id, owner_id, title, description, category, mode, price_paise, deposit_paise, pickup_zone, status, moderation_reason)
-    VALUES (v_listing_rejected, v_asset_rejected, v_campus_hitam, v_owner, 'Rejected Non-Compliant Item', 'Violates policy', 'notes', 'sale', 10000, 0, 'Admin Block', 'rejected', 'Violates campus exchange policy on proprietary exam solutions.');
+  INSERT INTO listing_media (listing_id, storage_path, sort_order)
+  VALUES (v_listing_tx_rental, 'listings/' || v_user_a || '/' || v_listing_tx_rental || '/0.jpg', 0);
 
-    -- Asset & Listing: Paused
-    INSERT INTO assets (id, campus_id, owner_id, title, category, condition, status)
-    VALUES (v_asset_paused, v_campus_hitam, v_owner, 'Paused Workshop Toolset', 'tools', 'good', 'active');
-    INSERT INTO listings (id, asset_id, campus_id, owner_id, title, description, category, mode, price_paise, deposit_paise, pickup_zone, status)
-    VALUES (v_listing_paused, v_asset_paused, v_campus_hitam, v_owner, 'Paused Workshop Toolset', 'Temporarily unavailable while owner is off-campus', 'tools', 'rental', 4000, 15000, 'Mechanical Lab', 'paused');
+  -- (c) Concurrency Target Asset & Published Listing (Clean and available for simultaneous acceptance)
+  INSERT INTO assets (id, campus_id, owner_id, title, description, status)
+  VALUES (v_asset_concurrency, v_campus_hitam, v_user_a, 'Lab Coat and Safety Glasses Set', 'Clean lab coat and impact safety glasses.', 'active');
 
-    -- Asset & Listing: Hidden
-    INSERT INTO assets (id, campus_id, owner_id, title, category, condition, status)
-    VALUES (v_asset_hidden, v_campus_hitam, v_owner, 'Hidden Reported Listing', 'other', 'fair', 'active');
-    INSERT INTO listings (id, asset_id, campus_id, owner_id, title, description, category, mode, price_paise, deposit_paise, pickup_zone, status, moderation_reason)
-    VALUES (v_listing_hidden, v_asset_hidden, v_campus_hitam, v_owner, 'Hidden Reported Listing', 'Hidden by moderator pending clarification', 'other', 'sale', 20000, 0, 'North Gate', 'hidden', 'Flagged by community pending photo clarification.');
+  INSERT INTO listings (id, asset_id, campus_id, owner_id, title, description, category, condition, defects, mode, price_paise, deposit_paise, pickup_zone, status)
+  VALUES (v_listing_concurrency, v_asset_concurrency, v_campus_hitam, v_user_a, 'Lab Coat and Safety Glasses Set', 'Standard chemistry lab gear set.', 'lab_gear', 'good', '', 'rental', 3000, 10000, 'Canteen Plaza', 'published');
 
-    -- 4. Active Transaction 1: Accepted Sale + Active Reservation
-    INSERT INTO transactions (
-      id, listing_id, asset_id, campus_id, owner_id, requester_id,
-      mode, status, quoted_price_paise, quoted_deposit_paise, pickup_zone, version
-    ) VALUES (
-      v_tx_sale, v_listing_sale, v_asset_sale, v_campus_hitam, v_owner, v_buyer,
-      'sale', 'accepted', 35000, 0, 'Library Ground Floor', 2
-    );
+  INSERT INTO listing_media (listing_id, storage_path, sort_order)
+  VALUES (v_listing_concurrency, 'listings/' || v_user_a || '/' || v_listing_concurrency || '/0.jpg', 0);
 
-    INSERT INTO reservations (transaction_id, asset_id, reserved_from, reserved_to, status)
-    VALUES (v_tx_sale, v_asset_sale, current_date, current_date + 3650, 'active');
+  -- (d) Draft Listing
+  INSERT INTO assets (id, campus_id, owner_id, title, description, status)
+  VALUES (v_asset_draft, v_campus_hitam, v_user_a, 'Arduino Starter Development Kit', 'Draft listing not yet published.', 'active');
 
-    -- Mark asset as reserved
-    UPDATE assets SET status = 'reserved' WHERE id = v_asset_sale;
+  INSERT INTO listings (id, asset_id, campus_id, owner_id, title, description, category, condition, defects, mode, price_paise, deposit_paise, pickup_zone, status)
+  VALUES (v_listing_draft, v_asset_draft, v_campus_hitam, v_user_a, 'Arduino Starter Development Kit', 'Sensors, breadboard, and Arduino Uno board.', 'electronics', 'like_new', '', 'sale', 120000, 0, 'Library Entrance', 'draft');
 
-    -- 5. Active Transaction 2: Accepted Rental + Active Reservation
-    INSERT INTO transactions (
-      id, listing_id, asset_id, campus_id, owner_id, requester_id,
-      mode, status, quoted_price_paise, quoted_deposit_paise,
-      start_date, end_date, rental_days, pickup_zone, version
-    ) VALUES (
-      v_tx_rental, v_listing_rental1, v_asset_rental1, v_campus_hitam, v_owner, v_buyer,
-      'rental', 'accepted', 25000, 20000,
-      current_date + 1, current_date + 5, 5, 'Academic Block Entrance', 2
-    );
+  -- (e) Pending Review Listing
+  INSERT INTO assets (id, campus_id, owner_id, title, description, status)
+  VALUES (v_asset_review, v_campus_hitam, v_user_a, 'Surveying Chain & Optical Level', 'Civil engineering surveying equipment.', 'active');
 
-    INSERT INTO reservations (transaction_id, asset_id, reserved_from, reserved_to, status)
-    VALUES (v_tx_rental, v_asset_rental1, current_date + 1, current_date + 5, 'active');
+  INSERT INTO listings (id, asset_id, campus_id, owner_id, title, description, category, condition, defects, mode, price_paise, deposit_paise, pickup_zone, status)
+  VALUES (v_listing_review, v_asset_review, v_campus_hitam, v_user_a, 'Surveying Chain & Optical Level', 'Complete surveying kit awaiting moderation approval.', 'other', 'good', '', 'rental', 15000, 50000, 'Admin Block Foyer', 'pending_review');
 
-    -- 6. Completed Historical Transaction
-    INSERT INTO assets (id, campus_id, owner_id, title, category, condition, status)
-    VALUES (v_asset_hist, v_campus_hitam, v_owner, 'Historical Engineering Drawing Set', 'drafting', 'good', 'active');
-    INSERT INTO listings (id, asset_id, campus_id, owner_id, title, description, category, mode, price_paise, deposit_paise, pickup_zone, status)
-    VALUES (v_listing_hist, v_asset_hist, v_campus_hitam, v_owner, 'Historical Engineering Drawing Set', 'Archived historical exchange', 'drafting', 'sale', 25000, 0, 'Library', 'archived');
+  -- (f) Rejected Listing (with moderation_reason)
+  INSERT INTO assets (id, campus_id, owner_id, title, description, status)
+  VALUES (v_asset_rejected, v_campus_hitam, v_user_a, 'Non-Compliant Exam Solution Bank', 'Handwritten semester solutions.', 'active');
 
-    INSERT INTO transactions (
-      id, listing_id, asset_id, campus_id, owner_id, requester_id,
-      mode, status, quoted_price_paise, quoted_deposit_paise, pickup_zone, version
-    ) VALUES (
-      v_tx_hist, v_listing_hist, v_asset_hist, v_campus_hitam, v_owner, v_buyer,
-      'sale', 'completed', 25000, 0, 'Library', 3
-    );
+  INSERT INTO listings (id, asset_id, campus_id, owner_id, title, description, category, condition, defects, mode, price_paise, deposit_paise, pickup_zone, status, moderation_reason)
+  VALUES (v_listing_rejected, v_asset_rejected, v_campus_hitam, v_user_a, 'Non-Compliant Exam Solution Bank', 'Proprietary exam materials.', 'other', 'fair', '', 'sale', 10000, 0, 'Library Entrance', 'rejected', 'Violates campus academic integrity policy regarding proprietary exam solutions.');
 
-    INSERT INTO reservations (transaction_id, asset_id, reserved_from, reserved_to, status)
-    VALUES (v_tx_hist, v_asset_hist, current_date - 10, current_date - 9, 'released');
-  END;
+  -- (g) Paused Listing
+  INSERT INTO assets (id, campus_id, owner_id, title, description, status)
+  VALUES (v_asset_paused, v_campus_hitam, v_user_a, 'Digital Vernier Caliper & Micrometer', 'Precision measurement tools.', 'active');
+
+  INSERT INTO listings (id, asset_id, campus_id, owner_id, title, description, category, condition, defects, mode, price_paise, deposit_paise, pickup_zone, status)
+  VALUES (v_listing_paused, v_asset_paused, v_campus_hitam, v_user_a, 'Digital Vernier Caliper & Micrometer', 'Temporarily paused while owner is off campus.', 'other', 'like_new', '', 'rental', 4000, 15000, 'Canteen Plaza', 'paused');
+
+  -- (h) Hidden Listing (with moderation_reason)
+  INSERT INTO assets (id, campus_id, owner_id, title, description, status)
+  VALUES (v_asset_hidden, v_campus_hitam, v_user_a, 'Flagged Chemistry Lab Reagents', 'Chemistry glassware and reagents.', 'active');
+
+  INSERT INTO listings (id, asset_id, campus_id, owner_id, title, description, category, condition, defects, mode, price_paise, deposit_paise, pickup_zone, status, moderation_reason)
+  VALUES (v_listing_hidden, v_asset_hidden, v_campus_hitam, v_user_a, 'Flagged Chemistry Lab Reagents', 'Hidden pending safety review.', 'lab_gear', 'fair', '', 'sale', 20000, 0, 'Admin Block Foyer', 'hidden', 'Hidden by moderator pending chemical storage and safety compliance verification.');
+
+  -- (i) Completed Historical Listing & Asset
+  INSERT INTO assets (id, campus_id, owner_id, title, description, status)
+  VALUES (v_asset_tx_hist, v_campus_hitam, v_user_a, 'First Year Drawing Drafter', 'Mini drafter with scale and clips.', 'active');
+
+  INSERT INTO listings (id, asset_id, campus_id, owner_id, title, description, category, condition, defects, mode, price_paise, deposit_paise, pickup_zone, status)
+  VALUES (v_listing_tx_hist, v_asset_tx_hist, v_campus_hitam, v_user_a, 'First Year Drawing Drafter', 'Archived historical exchange item.', 'other', 'good', '', 'sale', 25000, 0, 'Library Entrance', 'archived');
+
+  -- 9. Transactions (Exactly 3 initial transactions)
+
+  -- Transaction 1: Accepted Sale
+  INSERT INTO transactions (
+    id, listing_id, asset_id, campus_id, owner_id, requester_id,
+    mode, status, quoted_price_paise, quoted_deposit_paise, pickup_zone, version
+  ) VALUES (
+    v_tx_sale, v_listing_tx_sale, v_asset_tx_sale, v_campus_hitam, v_user_a, v_user_b,
+    'sale', 'accepted', 35000, 0, 'Library Entrance', 2
+  );
+
+  -- Transaction 2: Accepted Rental
+  INSERT INTO transactions (
+    id, listing_id, asset_id, campus_id, owner_id, requester_id,
+    mode, status, quoted_price_paise, quoted_deposit_paise,
+    start_date, end_date, rental_days, pickup_zone, version
+  ) VALUES (
+    v_tx_rental, v_listing_tx_rental, v_asset_tx_rental, v_campus_hitam, v_user_a, v_user_b,
+    'rental', 'accepted', 25000, 20000,
+    current_date + 1, current_date + 5, 5, 'Main Gate Reception', 2
+  );
+
+  -- Transaction 3: Completed Historical Sale
+  INSERT INTO transactions (
+    id, listing_id, asset_id, campus_id, owner_id, requester_id,
+    mode, status, quoted_price_paise, quoted_deposit_paise, pickup_zone, version
+  ) VALUES (
+    v_tx_hist, v_listing_tx_hist, v_asset_tx_hist, v_campus_hitam, v_user_a, v_user_b,
+    'sale', 'completed', 25000, 0, 'Library Entrance', 3
+  );
+
+  -- 10. Reservations (Exactly 2 active reservations + 1 completed historical)
+
+  -- Reservation 1: Active indefinitely for accepted sale
+  INSERT INTO reservations (transaction_id, asset_id, reservation_period, status)
+  VALUES (v_tx_sale, v_asset_tx_sale, tstzrange(now(), 'infinity'::timestamptz, '[)'), 'active');
+
+  -- Reservation 2: Active for accepted rental window + 1 hour turnaround buffer
+  v_start_tz := ((current_date + 1)::text || ' 00:00:00+00')::timestamptz;
+  v_end_tz := ((current_date + 5)::text || ' 23:59:59+00')::timestamptz + interval '1 hour';
+  INSERT INTO reservations (transaction_id, asset_id, reservation_period, status)
+  VALUES (v_tx_rental, v_asset_tx_rental, tstzrange(v_start_tz, v_end_tz, '[)'), 'active');
+
+  -- Reservation 3: Completed historical reservation in the past (status 'completed' does not block active GiST)
+  INSERT INTO reservations (transaction_id, asset_id, reservation_period, status)
+  VALUES (v_tx_hist, v_asset_tx_hist, tstzrange(now() - interval '10 days', now() - interval '9 days', '[)'), 'completed');
 
   RAISE NOTICE 'Synthetic fixtures applied successfully!';
 END $$;
