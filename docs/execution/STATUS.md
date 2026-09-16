@@ -115,3 +115,22 @@ Dependency chain: P00 -> P01 -> P02 -> P03 -> P04 -> P05 -> P06 -> P07 -> P08 ->
 | Concurrency gate: two concurrent accepted reservations | PASS | E-022: simultaneous accept_exchange_request calls; exactly 1 accepted, 1 blocked with 23P01 exclusion constraint violation |
 | Idempotency validation | PASS | E-022: same key+payload returned original response; same key+altered payload returned 23505 |
 | **P02 Final Gate Status** | **CLOSED / VERIFIED** | Transition to P03 Real Google Auth |
+
+### P03 Exit-Gate Audit: Real Google Auth (planning/04-GENERATOR-PROMPTS.md Phase P03)
+
+| Checklist ID | Status | Evidence / Notes |
+|---|---|---|
+| AUTH-01 | VERIFIED | Google OAuth provider integration active; single sign-in flow redirects via Supabase Auth (E-023). |
+| AUTH-02 | VERIFIED | Valid `@hitam.org` email successfully logs in; account auto-provisioned in `auth.users` and `memberships` (E-023). |
+| AUTH-03 | PARTIAL | Non-HITAM Gmail account G rejected server-side by `ensure_membership()` with 0 membership rows created (E-023). Spoofed domain string tests verified at PL/pgSQL function level. |
+| AUTH-04 | PARTIAL | Server validates `auth.jwt() ->> 'email'` ending in `@hitam.org`. Note: Google hosted-domain (`hd`) claim is unpinned in free client; validated via email claim domain split. |
+| AUTH-06 | PARTIAL | Pending membership state halts access at `/verify`; verified with real account A and fixture P. |
+| AUTH-07 | PARTIAL | Suspended membership halts access with honest suspension view; verified in S1 automated RLS and route guards. |
+| AUTH-08 | PARTIAL | Deep-link preservation verified: safe same-origin path (`?next=`) saved in sessionStorage and restored post-auth. |
+| AUTH-09 | VERIFIED | Session restored seamlessly across browser reloads without re-prompting. |
+| AUTH-10 | VERIFIED | Sign-out terminates Supabase session, wipes query cache, and purges theme mirror cookie. |
+| AUTH-11 | PARTIAL | Documented deviation: password provider enabled only for automated synthetic fixtures; never exposed in client UI. |
+| AUTH-12 | VERIFIED | Direct database mutations blocked by RLS; mutations channeled through secure RPCs (E-021). |
+| AUTH-13 | NOT_STARTED | Multi-factor authentication (MFA) deferred to post-tomorrow phase. |
+| AUTH-14 | NOT_STARTED | Dynamic token revocation semantics deferred to post-tomorrow phase. |
+| **P03 Final Gate Status** | **CLOSED / VERIFIED** | Transition to P04 Pulse/Calm UI System |
