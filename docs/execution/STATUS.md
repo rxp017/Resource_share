@@ -54,9 +54,9 @@ Doc 08 estimates approximately 14-22 focused person-hours for the P00-P08 path, 
 
 | Phase | Scope (one line) | Status | Gate notes |
 |---|---|---|---|
-| P00 | Discovery, verification, ledger | IN_PROGRESS | Ledger v2 written (E-008..E-010); docs 07+08 read in full; milestone groups captured. Remaining: docs 05/02/03 single-line reads (I-001), then the exit report |
-| P01 | Design contract, routes, tokens | NOT_STARTED | Inputs pending: docs 02, 03, 05 UX checklist (I-001) |
-| P02 | Vite scaffold + first migrations + RLS | NOT_STARTED | Supabase project creation issued (D-010); git init + D-009 .gitignore before the first commit |
+| P00 | Discovery, verification, ledger | VERIFIED | Scope/constraints verified; ledger v2 written; docs read in full |
+| P01 | Design contract, routes, tokens | VERIFIED | Delivered: DESIGN-CONTRACT.md, ROUTES.md, TASKS.md (E-015) |
+| P02 | Vite scaffold + first migrations + RLS | IN_PROGRESS | Scaffold PASS, build PASS (126ms), P02.3b fix list executed, P02.4 migrations next |
 | P03 | Real Google OAuth + HITAM membership | NOT_STARTED | Google account exists; OAuth client after the Supabase project URL is known |
 | P04 | Shell, Pulse/Calm themes, onboarding | NOT_STARTED | |
 | P05 | Listings, private media, search, basic moderation | NOT_STARTED | |
@@ -96,3 +96,10 @@ Dependency chain: P00 -> P01 -> P02 -> P03 -> P04 -> P05 -> P06 -> P07 -> P08 ->
 - Supabase liveness VERIFIED (E-012). Google OAuth client + ap-south-1 region: user-reported (E-013); real-login verification is the P03 gate.
 - P01: IN_PROGRESS - DESIGN-CONTRACT.md, ROUTES.md, TASKS.md delivered by block P01.1 (E-015). The phase closes when the file-creation output is pasted back and this audit passes: all core screens + failure states mapped (ROUTES.md); coherent Pulse/Calm token palette, typography, spacing, interaction contract (DESIGN-CONTRACT.md); PAY and UX requirement IDs appear in routes; design assumptions recorded, no invented testing results.
 - Next: P02 - scaffold files (P02.1), install (P02.2), verify + git (P02.3), then migrations (P02.4).
+
+## Handover update 2026-09-17 - New implementation engineer
+
+- Handover accepted per `docs/execution/HANDOVER.md`. Commit `8c7ccfa` on `origin/main` confirmed.
+- P00 and P01 confirmed VERIFIED and CLOSED.
+- P02 status: IN_PROGRESS. Scaffold, npm dependencies, Vite production build, and TypeScript check verified passing (126 ms). P02.3b fix list executed: 0-byte `Get-Content` removed, `docs/execution/backups/` untracked and gitignored, `src/modules/README.md` and `src/shared/README.md` created, corrected forbidden-file guard passed.
+- Next: P02.4 - author `supabase/migrations/0001_schema.sql` and `0002_rls_and_policies.sql`, apply via Supabase SQL Editor, and run negative REST authorization tests.

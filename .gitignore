@@ -15,3 +15,6 @@ planning/source-evidence/
 # misc
 *.log
 .DS_Store
+
+# local execution ledger backups
+docs/execution/backups/

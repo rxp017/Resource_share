@@ -11,3 +11,4 @@
 
 - I-001 RESOLVED: all planning documents needed for P00-P08 are now read in full (doc 06 remains deliberately deferred to P14).
 - I-008 (OPEN - deferred): ESLint not yet configured; planned for P04. ENV-04 requires a working lint before the Foundation group can be credited at P08; tracked in TASKS.md.
+- I-009 (RESOLVED): Working tree divergence from HANDOVER.md (commit 8c7ccfa was already committed and pushed to origin/main; 0-byte Get-Content and backups were committed). Resolved in P02.3b: Get-Content removed, backups untracked from index while preserved on disk, .gitignore updated, and corrected forbidden-file guard passed.
