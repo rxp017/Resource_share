@@ -1,0 +1,17 @@
+# dependencies / build output
+node_modules/
+dist/
+
+# secrets - never commit
+.env
+.env.*
+!.env.example
+
+# personal source attachments (contain team member names / private photos)
+team_12_ppt.pptx
+WhatsApp Image*.jpeg
+planning/source-evidence/
+
+# misc
+*.log
+.DS_Store

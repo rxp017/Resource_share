@@ -1,0 +1,7 @@
+# Issues
+
+- I-001 (OPEN - blocks P00 exit and P01): the chat platform truncated the pasted P00.2 output, so planning docs 02, 03, 05, 06, 08 and doc 07 lines ~41-102 were never delivered. Fix: blocks P00.6a/P00.6b (read-only) provided. Impact: exact DOC-01..06 checklist text, doc 08 milestone groups/weights, and doc 07 open decisions are pending.
+- I-002 (OPEN - external): gh, supabase CLI, wrangler, docker not installed; npm registry reachability unverified. Not a P01 blocker. P02 migration testing requires a Supabase account + disposable hosted test project (D-004) or a local Docker stack. P08 additionally requires GitHub + Cloudflare accounts. Account preparation checklist issued 2026-09-17.
+- I-003 (NOTED - mitigated): PowerShell 5.1 2>$null on native commands produced exit -1 artifacts in P00.4. All future blocks capture native output with 2>&1 and check $LASTEXITCODE explicitly.
+- I-004 (OPEN - external): Google OAuth access untested (no local check exists). Blocks only the P03 real-login gate; synthetic permission tests are not a substitute and will not be claimed as such.
+- I-005 (NOTED): no git repository yet - intentional; git init happens in P02 with .gitignore before the first commit, planning pack committed first (D-008).

@@ -1,0 +1,27 @@
+# Decision log
+
+Format per the architecture skill: context -> decision -> trade-offs. Dated. Open items from doc 07 are copied in section 3 and filled only with verified answers.
+
+## 1. Confirmed decisions
+
+- D-001 (2026-09-16) Stack: React + Vite + TypeScript SPA on Cloudflare Pages Free; Supabase Free for Postgres, auth, private storage and narrow server commands; GitHub for source. Source: planning README baseline + master contract. Trade-off: no Next.js SSR - all authorization must live in Supabase RLS/RPC/storage policies, never in client code.
+- D-002 (2026-09-16) Package manager: npm 11.17.0 (installed; pnpm/yarn/bun absent). One package manager; package-lock.json committed from P02 onward.
+- D-003 (2026-09-16) Runtime: Node v24.19.0 locally. Pin for Cloudflare Pages via a .node-version file plus NODE_VERSION env var set in BOTH Production and Preview environments (official Pages build-image docs confirm any Node version is supported via NODE_VERSION / .nvmrc / .node-version).
+- D-004 (2026-09-17) Test database route: local stack unavailable (no Docker, no Supabase CLI - E-005), so the documented disposable hosted test project is the selected route for migration/RLS testing once a Supabase account exists. A populated project is never reset. If the user later prefers local, install Docker + Supabase CLI and switch; migrations are environment-agnostic files.
+- D-005 (2026-09-17) Version proposal, verified against official sources (E-006); final pins lock at P02 install time from the live registry: React 19.3.x; Vite 8.x; TypeScript as pinned by the official Vite react-ts template at scaffold time; @supabase/supabase-js 2.x (2.116.0 latest observed); Supabase CLI 2.117+ when installed; wrangler 4.132.x optional (not required if deploying via the Pages Git integration; wrangler officially supports Windows 11, which this machine is). Free-tier envelopes: Pages Free 500 builds/month, 1 concurrent build, 20-minute timeout, 20,000 files, 25 MiB per file, 100 projects; Supabase Free 2 active projects, 500 MB database, 1 GB file storage, 5 GB egress, 50,000 MAU, projects pause after 1 week of inactivity.
+- D-006 (2026-09-17) PowerShell 5.1 conventions for every block: .NET file APIs for UTF-8-no-BOM writes; -LiteralPath everywhere (root contains parentheses); native commands captured with 2>&1 (never 2>$null, which produced exit -1 artifacts in P00.4); explicit $LASTEXITCODE checks; stop-on-error.
+- D-007 (2026-09-17) Frontend architecture style: the frontend-architecture skill module model - src/modules/{feature}/ with a curated barrel index.ts, pages as directories ({page}.tsx + {page}.styles.ts + index.ts + README.md), strict server-state (query layer) vs UI-state (module store) split, barrel-only cross-module imports, co-located styles, component promotion ladder, shared/ for cross-module building blocks. Applied from the P02 scaffold onward.
+- D-008 (2026-09-17) VCS plan: git init in P02 with .gitignore BEFORE first commit; planning pack + attachments committed first so history is provable; app code follows. No secrets ever committed.
+
+## 2. Skills ledger (paths read, concrete application)
+
+| Date | Path | Application |
+|---|---|---|
+| 2026-09-16 | C:\Users\rajashekar\.agents\skills\architecture\SKILL.md | ADR format of this file; simplicity-first; P00 exit validation checklist |
+| 2026-09-16 | C:\Users\rajashekar\.agents\skills\frontend-architecture\SKILL.md | D-007 layout rules; P01 route/component planning input |
+
+Per-phase skills (doc 07 map) will be read at their phases and logged here. No other skill is claimed as read.
+
+## 3. Open decisions copied from document 07 - PENDING
+
+The remainder of doc 07 (lines ~41-102) was not delivered (platform truncation - I-001). Known-open items from the planning README, copied here pending the verbatim list: deadline hour; student-status/enrollment policy; operator identity and launch authorization. To be completed with verified answers only, after the P00.6a read.
