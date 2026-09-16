@@ -5,6 +5,7 @@ dist/
 # secrets - never commit
 .env
 .env.*
+.env.test
 !.env.example
 
 # personal source attachments (contain team member names / private photos)
