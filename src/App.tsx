@@ -1,29 +1,77 @@
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
-const HAS_ANON_KEY =
-  Boolean(import.meta.env.VITE_SUPABASE_ANON_KEY) &&
-  import.meta.env.VITE_SUPABASE_ANON_KEY !== 'REPLACE_ME_WITH_THE_ANON_PUBLIC_KEY'
+// src/App.tsx
+import React, { useMemo } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { AuthProvider, RequireAuth, RequireActiveMembership, RequireModerator, LoginPage, VerifyPendingPage } from './modules/auth';
+import { PublicLandingPage } from './modules/landing/PublicLandingPage';
+import { UnavailableState } from './shared/components/UnavailableState';
 
-function App() {
+export const App: React.FC = () => {
+  const queryClient = useMemo(() => new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: 1,
+        staleTime: 1000 * 30,
+      },
+    },
+  }), []);
+
   return (
-    <main className="page">
-      <h1>HITAM Resource Share</h1>
-      <p className="tagline">
-        Campus resource sharing and marketplace for verified HITAM students -
-        buy, sell, lend, borrow and rent with clear exchange records.
-      </p>
-      <ul className="status-list">
-        <li>Scaffold: P02 (build/typecheck gate pending)</li>
-        <li>Supabase URL configured: {SUPABASE_URL ? 'yes' : 'no - create .env'}</li>
-        <li>Supabase anon key configured: {HAS_ANON_KEY ? 'yes' : 'no - edit .env'}</li>
-        <li>Design system (Pulse/Calm): P04</li>
-        <li>Sign-in (Google, @hitam.org only): P03</li>
-      </ul>
-      <p className="note">
-        This page is the P02 scaffold check. No feature is implemented yet;
-        nothing on it implies working marketplace behavior.
-      </p>
-    </main>
-  )
-}
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <AuthProvider onSignOutCleanup={() => queryClient.clear()}>
+          <Routes>
+            {/* Public routes */}
+            <Route path="/" element={<PublicLandingPage />} />
+            <Route path="/login" element={<LoginPage />} />
 
-export default App
+            {/* Authenticated user routes (Pending or Active) */}
+            <Route element={<RequireAuth />}>
+              <Route path="/verify" element={<VerifyPendingPage />} />
+
+              {/* Active Campus Members Only */}
+              <Route element={<RequireActiveMembership />}>
+                <Route path="/explore" element={<div style={{ padding: '24px' }}><h2>Explore Feed</h2><p>Welcome to the campus marketplace.</p></div>} />
+                <Route path="/listings/new" element={<div style={{ padding: '24px' }}><h2>Create Listing</h2></div>} />
+                <Route path="/listings/:id" element={<div style={{ padding: '24px' }}><h2>Listing Detail</h2></div>} />
+                <Route path="/listings/:id/request" element={<div style={{ padding: '24px' }}><h2>Request Exchange</h2></div>} />
+                <Route path="/my/listings" element={<div style={{ padding: '24px' }}><h2>My Listings</h2></div>} />
+                <Route path="/exchanges" element={<div style={{ padding: '24px' }}><h2>My Exchanges</h2></div>} />
+                <Route path="/exchanges/:id" element={<div style={{ padding: '24px' }}><h2>Exchange Receipt</h2></div>} />
+                <Route path="/onboarding" element={<div style={{ padding: '24px' }}><h2>Onboarding</h2></div>} />
+                <Route path="/settings" element={<div style={{ padding: '24px' }}><h2>Settings</h2></div>} />
+                <Route path="/profile" element={<div style={{ padding: '24px' }}><h2>My Profile</h2></div>} />
+                <Route path="/profile/:userId" element={<div style={{ padding: '24px' }}><h2>Trust Profile</h2></div>} />
+                <Route path="/help" element={<div style={{ padding: '24px' }}><h2>Help & Support</h2></div>} />
+
+                {/* Deferred preview routes per ROUTES.md */}
+                <Route path="/inbox" element={<UnavailableState featureName="Inbox & Chat" reason="Real-time messaging is deferred to milestone P10." />} />
+                <Route path="/inbox/:id" element={<UnavailableState featureName="Inbox Conversation" reason="Real-time messaging is deferred to milestone P10." />} />
+                <Route path="/notifications" element={<UnavailableState featureName="Notifications" reason="Notification service is deferred to milestone P10." />} />
+                <Route path="/feedback" element={<UnavailableState featureName="Feedback & Reviews" reason="User ratings and reviews are deferred to milestone P11." />} />
+                <Route path="/exchanges/:id/handoff" element={<UnavailableState featureName="QR Pickup & Handoff" reason="In-person QR token confirmation is deferred to milestone P09." />} />
+
+                {/* Operator / Moderator Queue */}
+                <Route element={<RequireModerator />}>
+                  <Route path="/admin/moderation" element={<div style={{ padding: '24px' }}><h2>Moderation Queue</h2></div>} />
+                  <Route path="/admin/members" element={<div style={{ padding: '24px' }}><h2>Member Verification</h2></div>} />
+                </Route>
+              </Route>
+            </Route>
+
+            {/* 404 catch-all */}
+            <Route path="*" element={
+              <div style={{ maxWidth: '480px', margin: '60px auto', textAlign: 'center', padding: '24px' }}>
+                <h1 style={{ fontSize: '2rem', marginBottom: '8px' }}>404</h1>
+                <p style={{ color: '#64748b', marginBottom: '20px' }}>Page not found</p>
+                <Navigate to="/" replace />
+              </div>
+            } />
+          </Routes>
+        </AuthProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
+};
+
+export default App;
