@@ -20,6 +20,11 @@ import {
   MyListingsPage,
   ModerationQueuePage,
 } from './modules/listings';
+import {
+  RequestExchangePage,
+  ExchangesListPage,
+  ExchangeDetailPage,
+} from './modules/exchanges';
 import { PublicLandingPage } from './modules/landing/PublicLandingPage';
 import { UnavailableState } from './shared/components/UnavailableState';
 
@@ -63,31 +68,10 @@ export const App: React.FC = () => {
                       <Route path="/explore" element={<ExplorePage />} />
                       <Route path="/listings/new" element={<CreateListingPage />} />
                       <Route path="/listings/:id" element={<ListingDetailPage />} />
-                      <Route
-                        path="/listings/:id/request"
-                        element={
-                          <div style={{ padding: '24px' }}>
-                            <h2>Request Exchange</h2>
-                          </div>
-                        }
-                      />
+                      <Route path="/listings/:id/request" element={<RequestExchangePage />} />
                       <Route path="/my/listings" element={<MyListingsPage />} />
-                      <Route
-                        path="/exchanges"
-                        element={
-                          <div style={{ padding: '24px' }}>
-                            <h2>My Exchanges</h2>
-                          </div>
-                        }
-                      />
-                      <Route
-                        path="/exchanges/:id"
-                        element={
-                          <div style={{ padding: '24px' }}>
-                            <h2>Exchange Receipt</h2>
-                          </div>
-                        }
-                      />
+                      <Route path="/exchanges" element={<ExchangesListPage />} />
+                      <Route path="/exchanges/:id" element={<ExchangeDetailPage />} />
                       <Route
                         path="/profile"
                         element={

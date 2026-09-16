@@ -171,3 +171,41 @@ Dependency chain: P00 -> P01 -> P02 -> P03 -> P04 -> P05 -> P06 -> P07 -> P08 ->
 | LST-13 | VERIFIED | MyListingsPage allows owner to pause/resume or archive listings with immediate UI state reflection (`MyListingsPage.tsx`). |
 | LST-14 | VERIFIED | Campus moderator/admin queue with approve, flag, archive actions using secure `moderate_listing` RPC (`moderate_listing_rpc = 1`, `ModerationQueuePage.tsx`). |
 | **P05 Final Gate Status** | **CLOSED / VERIFIED** | Transition to S6 Sale Requests & Private Payment Proof Workflow |
+
+### P06 Exit-Gate Audit: Sale Requests & Private Direct-Payment Proof (planning/04-GENERATOR-PROMPTS.md Phase P06)
+
+| Checklist ID | Status | Evidence / Notes |
+|---|---|---|
+| PAY-01 | VERIFIED | Buyer sees frozen INR amount, explicit instructions to pay seller directly outside platform, and clear zero-escrow disclaimers (`RequestExchangePage.tsx`, `ExchangeDetailPage.tsx`, `E-028`). |
+| PAY-02 | VERIFIED | Only buyer can upload proof for accepted paid transaction; free loans bypass payment evidence (`0003_security_fixes.sql`, `E-028`, `E-029`). |
+| PAY-03 | VERIFIED | Receipt media is stored in private `payment-proofs` bucket, physically and access-logically isolated from public/listing media (`0003_security_fixes.sql`, `E-028`). |
+| PAY-04 | VERIFIED | Anonymous, outsider, and non-participant access to payment receipts rejected at storage and REST policy boundaries (`is_proof_participant`, `E-028`). |
+| PAY-05 | VERIFIED | Payment proof amount must exactly match agreed terms; discrepancies rejected server-side (`submit_payment_proof`, `E-028`). |
+| PAY-06 | VERIFIED | Client HTML5 canvas strips EXIF metadata; hard cap of maximum 3 payment proof submissions per transaction enforced in DB (`E-028`). |
+| PAY-07 | VERIFIED | Proof submission transitions transaction to `proof_submitted`; never marks automatic bank verification or auto-completes (`E-028`). |
+| PAY-08 | VERIFIED | Only payee can acknowledge or dispute current proof version; buyer cannot acknowledge own proof (HTTP 403, `E-028`). |
+| PAY-09 | VERIFIED | Latest proof version enforced by `v_max_version` check; stale acknowledgements fail safely (`0003_security_fixes.sql`). |
+| PAY-10 | VERIFIED | Idempotency keys protect both proof upload and acknowledgement commands against duplicate replay (`0003_security_fixes.sql`). |
+| PAY-11 | VERIFIED | Storage path must strictly adhere to `proofs/{payer_id}/{tx_id}/` format; arbitrary paths rejected (`E-028`). |
+| PAY-12 | VERIFIED | Seller dispute transitions transaction to `seller_disputed` without penalty, allowing buyer to submit corrected proof version (`ExchangeDetailPage.tsx`, `0003_security_fixes.sql`). |
+| PAY-13 | VERIFIED | Honest UI error and pending states; no automatic duplicate payment instructions (`ExchangeDetailPage.tsx`). |
+| PAY-16 | VERIFIED | Proof details and receipts kept strictly in private storage; zero leaks in git, logs, or public URLs (`E-028`). |
+| TX-01 | VERIFIED | Self-request rejected server-side with error 42501; unauthorized campus requests blocked (`0003_security_fixes.sql`). |
+| TX-02 | VERIFIED | Sale request creates immutable frozen quoted price (`quoted_price_paise`) snapshot (`E-028`). |
+| TX-03 | VERIFIED | Sale acceptance checks active reservations on asset; competing active holds cleanly rejected with 23P01 (`E-028`). |
+| TX-04 | VERIFIED | Decline and withdraw RPCs close only eligible transactions; pending requests do not hold inventory (`E-028`). |
+| TX-05 | VERIFIED | `cancel_before_pickup` atomically releases reservation holds and reverts asset state (`0003_security_fixes.sql`). |
+| TX-11 | VERIFIED | Listing price edits cannot alter existing accepted transaction quotes (`0003_security_fixes.sql`). |
+| TX-12 | VERIFIED | Exclusive asset reservation prevents concurrent sale and rental (`0002_rls_and_policies.sql`, `E-028`). |
+| **P06 Final Gate Status** | **CLOSED / VERIFIED** | Transition to S7 Loan/Rental Requests & Availability |
+
+### P07 Exit-Gate Audit: Loan/Rental Requests, Availability & Overlap Gate (planning/04-GENERATOR-PROMPTS.md Phase P07)
+
+| Checklist ID | Status | Evidence / Notes |
+|---|---|---|
+| TX-06 | VERIFIED | Loan and rental requests enforce start date >= today, end date >= start date, and maximum 30-day booking duration (`0003_security_fixes.sql`, `E-029`). |
+| TX-07 | VERIFIED | Rental quote calculated using integer daily rate: `v_rental_days * price_paise` (tested 5 days * 2000 = 10000 paise, `E-029`). |
+| TX-08 | VERIFIED | Consistent ISO date format displayed and stored; no hidden timezone shifts (`RequestExchangePage.tsx`, `ExchangeDetailPage.tsx`). |
+| TX-09 | VERIFIED | PostgreSQL exclusion constraint `no_overlapping_active_reservations` enforces zero overlapping active reservations at DB boundary (HTTP 400, 23P01 violation verified, `E-029`). |
+| TX-10 | VERIFIED | Half-open intervals `tstzrange` with 1-hour turnaround buffer enforced on acceptance (`0002_rls_and_policies.sql`, `E-029`). |
+| **P07 Final Gate Status** | **CLOSED / VERIFIED** | Transition to S8 Verification & Cloudflare Live Rehearsal |
