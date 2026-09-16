@@ -1,6 +1,6 @@
 // src/modules/auth/NotEligiblePage.tsx
 import React from 'react';
-import { useAuth } from './AuthContext';
+import { useAuth } from './useAuth';
 
 export const NotEligiblePage: React.FC = () => {
   const { user, signOut } = useAuth();

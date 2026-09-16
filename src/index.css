@@ -1,25 +1,209 @@
-/* Minimal P02 scaffold styles - replaced by the token system in P04. */
-* { box-sizing: border-box; }
-html, body, #root { margin: 0; padding: 0; min-height: 100%; }
+/* src/index.css */
+/* Modern Typography Fonts via Fontsource */
+@import '@fontsource/space-grotesk/500.css';
+@import '@fontsource/space-grotesk/700.css';
+@import '@fontsource/source-sans-3/400.css';
+@import '@fontsource/source-sans-3/600.css';
+@import '@fontsource/source-sans-3/700.css';
+
+/* ==========================================================================
+   Semantic Theme Tokens (Pulse / Calm x Light / Dark)
+   WCAG 2.1 AA verified in scripts/contrast-check.mjs
+   ========================================================================== */
+
+/* 1. Pulse Light */
+html[data-style="pulse"][data-appearance="light"] {
+  --color-bg: #FAF6EF;
+  --color-surface: #FFFFFF;
+  --color-text: #201A17;
+  --color-text-muted: #6B6259;
+  --color-border: #E7DFD3;
+  --color-accent: #0F766E;
+  --color-accent-contrast: #FFFFFF;
+  --color-focus-ring: #0F766E;
+  --color-success: #166534;
+  --color-warning: #92400E;
+  --color-danger: #B91C1C;
+  --font-display: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+  --font-body: 'Source Sans 3', system-ui, -apple-system, sans-serif;
+  --radius-card: 12px;
+  --radius-btn: 8px;
+}
+
+/* 2. Pulse Dark */
+html[data-style="pulse"][data-appearance="dark"] {
+  --color-bg: #201A17;
+  --color-surface: #2A2320;
+  --color-text: #F5EFE6;
+  --color-text-muted: #B3A79A;
+  --color-border: #453B33;
+  --color-accent: #5EEAD4;
+  --color-accent-contrast: #06201D;
+  --color-focus-ring: #5EEAD4;
+  --color-success: #4ADE80;
+  --color-warning: #FBBF24;
+  --color-danger: #F87171;
+  --font-display: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+  --font-body: 'Source Sans 3', system-ui, -apple-system, sans-serif;
+  --radius-card: 12px;
+  --radius-btn: 8px;
+}
+
+/* 3. Calm Light (Default) */
+html[data-style="calm"][data-appearance="light"],
+html:not([data-style]) {
+  --color-bg: #F5F6F7;
+  --color-surface: #FFFFFF;
+  --color-text: #2F3A45;
+  --color-text-muted: #5D6B7A;
+  --color-border: #DFE3E8;
+  --color-accent: #0F766E;
+  --color-accent-contrast: #FFFFFF;
+  --color-focus-ring: #0F766E;
+  --color-success: #15803D;
+  --color-warning: #A16207;
+  --color-danger: #B91C1C;
+  --font-display: 'Source Sans 3', system-ui, -apple-system, sans-serif;
+  --font-body: 'Source Sans 3', system-ui, -apple-system, sans-serif;
+  --radius-card: 8px;
+  --radius-btn: 6px;
+}
+
+/* 4. Calm Dark */
+html[data-style="calm"][data-appearance="dark"] {
+  --color-bg: #10161D;
+  --color-surface: #1A222B;
+  --color-text: #E6EBF0;
+  --color-text-muted: #9AA7B4;
+  --color-border: #33404D;
+  --color-accent: #7FD8CE;
+  --color-accent-contrast: #0A2420;
+  --color-focus-ring: #7FD8CE;
+  --color-success: #4ADE80;
+  --color-warning: #FCD34D;
+  --color-danger: #FCA5A5;
+  --font-display: 'Source Sans 3', system-ui, -apple-system, sans-serif;
+  --font-body: 'Source Sans 3', system-ui, -apple-system, sans-serif;
+  --radius-card: 8px;
+  --radius-btn: 6px;
+}
+
+/* Density Variants */
+html[data-density="compact"] {
+  --spacing-unit: 3px;
+  --density-pad: 8px 12px;
+}
+
+html[data-density="comfortable"],
+html:not([data-density]) {
+  --spacing-unit: 4px;
+  --density-pad: 12px 16px;
+}
+
+/* ==========================================================================
+   Base Elements & Accessibility Reset
+   ========================================================================== */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 body {
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
   font-size: 16px;
   line-height: 1.5;
-  color: #201a17;
-  background: #faf6ef;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
 }
-.page {
-  max-width: 42rem;
-  margin: 0 auto;
-  padding: 48px 24px;
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  color: var(--color-text);
+  line-height: 1.25;
 }
-h1 { font-size: 2rem; line-height: 1.2; margin: 0 0 8px; }
-.tagline { margin: 0 0 24px; color: #4a4238; }
-.status-list {
-  background: #ffffff;
-  border: 1px solid #e7dfd3;
-  border-radius: 12px;
-  padding: 16px 24px;
-  margin: 0 0 16px;
+
+/* 44px Minimum Touch Target Rule */
+button,
+a,
+input[type="button"],
+input[type="submit"],
+input[type="reset"] {
+  min-height: 44px;
+  min-width: 44px;
 }
-.note { font-size: 0.875rem; color: #5d574d; }
+
+/* Visible 2px focus ring everywhere */
+*:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Skip link */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 16px;
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+  padding: 10px 16px;
+  z-index: 10000;
+  font-weight: 700;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: top 0.15s ease-out;
+}
+
+.skip-link:focus {
+  top: 16px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+html[data-motion="reduced"] *,
+html[data-motion="reduced"] *::before,
+html[data-motion="reduced"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* Responsive Layout Breakpoints */
+@media (min-width: 768px) {
+  .desktop-campus-name {
+    display: inline !important;
+  }
+  .desktop-nav {
+    display: flex !important;
+  }
+  .mobile-bottom-nav {
+    display: none !important;
+  }
+  .desktop-footer {
+    display: block !important;
+  }
+  main#main-content {
+    padding-bottom: 24px !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .desktop-nav {
+    display: none !important;
+  }
+  .mobile-bottom-nav {
+    display: flex !important;
+  }
+}

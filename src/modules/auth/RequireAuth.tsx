@@ -1,7 +1,7 @@
 // src/modules/auth/RequireAuth.tsx
 import React from 'react';
 import { Navigate, useLocation, Outlet } from 'react-router-dom';
-import { useAuth } from './AuthContext';
+import { useAuth } from './useAuth';
 import { NotEligiblePage } from './NotEligiblePage';
 
 export const RequireAuth: React.FC = () => {

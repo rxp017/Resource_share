@@ -1,10 +1,9 @@
 // src/modules/auth/AuthContext.tsx
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import type { User, Session } from '@supabase/supabase-js';
 import { supabase } from '../../shared/api-client/supabase';
+import { AuthContext } from './context';
 import type { AuthContextValue, MembershipInfo } from './types';
-
-const AuthContext = createContext<AuthContextValue | null>(null);
 
 export interface AuthProviderProps {
   children: React.ReactNode;
@@ -129,10 +128,3 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, onSignOutC
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-export function useAuth(): AuthContextValue {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-}

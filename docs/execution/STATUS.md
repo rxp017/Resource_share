@@ -134,3 +134,20 @@ Dependency chain: P00 -> P01 -> P02 -> P03 -> P04 -> P05 -> P06 -> P07 -> P08 ->
 | AUTH-13 | NOT_STARTED | Multi-factor authentication (MFA) deferred to post-tomorrow phase. |
 | AUTH-14 | NOT_STARTED | Dynamic token revocation semantics deferred to post-tomorrow phase. |
 | **P03 Final Gate Status** | **CLOSED / VERIFIED** | Transition to P04 Pulse/Calm UI System |
+
+### P04 Exit-Gate Audit: Pulse/Calm UI System & Preferences (planning/04-GENERATOR-PROMPTS.md Phase P04)
+
+| Checklist ID | Status | Evidence / Notes |
+|---|---|---|
+| UX-01 | VERIFIED | Pulse and Calm implemented with dedicated semantic tokens, typography (`Space Grotesk` + `Source Sans 3`), and component borders (`E-024`). |
+| UX-02 | VERIFIED | 40/40 WCAG 2.1 AA token contrast checks passed in `scripts/contrast-check.mjs` across all 4 theme combinations. |
+| UX-03 | VERIFIED | No-flash bootstrap script injected into `index.html` head reading `rs_theme` cookie. |
+| UX-04 | VERIFIED | Equal content sample listing preview in `OnboardingPage` for Pulse and Calm. |
+| UX-05 | VERIFIED | "Skip for now" defaults to Calm with system appearance per planning specification. |
+| UX-06 | VERIFIED | Independent appearance (system/light/dark) controls wired in Onboarding and Settings with live DOM updates and Supabase persistence. |
+| UX-07 | VERIFIED | Independent motion controls (system/reduced) with CSS reset reducing transitions to 0.01ms. |
+| UX-08 | VERIFIED | Display density controls (comfortable/compact) altering root spacing unit tokens. |
+| UX-09 | VERIFIED | Responsive `AppLayout` with desktop sticky top navigation and mobile 44px touch-target bottom navigation bar. |
+| UX-10 | VERIFIED | Shared state components (`Skeleton`, `EmptyState`, `ErrorState`, `ForbiddenState`, `UnavailableState`) with honest deferred feature explanations. |
+| UX-11 | VERIFIED | Settings page enables account review, preference edits with atomic rollback on failure, and clean sign-out. |
+| **P04 Final Gate Status** | **CLOSED / VERIFIED** | Transition to S4 Early Cloudflare Pages Deployment |

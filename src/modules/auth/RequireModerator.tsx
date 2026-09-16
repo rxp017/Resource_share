@@ -1,7 +1,7 @@
 // src/modules/auth/RequireModerator.tsx
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import { useAuth } from './AuthContext';
+import { useAuth } from './useAuth';
 
 export const RequireModerator: React.FC = () => {
   const { membership, isLoading } = useAuth();

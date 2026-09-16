@@ -1,7 +1,7 @@
 // src/modules/auth/VerifyPendingPage.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from './AuthContext';
+import { useAuth } from './useAuth';
 
 export const VerifyPendingPage: React.FC = () => {
   const { user, refreshMembership, signOut } = useAuth();

@@ -1,7 +1,7 @@
 // src/modules/auth/RequireActiveMembership.tsx
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from './AuthContext';
+import { useAuth } from './useAuth';
 import { NotEligiblePage } from './NotEligiblePage';
 
 export const RequireActiveMembership: React.FC = () => {

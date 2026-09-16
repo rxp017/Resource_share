@@ -1,7 +1,7 @@
 // src/modules/auth/LoginPage.tsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useAuth } from './AuthContext';
+import { useAuth } from './useAuth';
 
 export const LoginPage: React.FC = () => {
   const { user, membership, isLoading, signInWithGoogle } = useAuth();
