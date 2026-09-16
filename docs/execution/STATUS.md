@@ -103,4 +103,15 @@ Dependency chain: P00 -> P01 -> P02 -> P03 -> P04 -> P05 -> P06 -> P07 -> P08 ->
 - P00 and P01 confirmed VERIFIED and CLOSED.
 - P02 status: IN_PROGRESS. Scaffold, npm dependencies, Vite production build, and TypeScript check verified passing (126 ms). P02.3b fix list executed: 0-byte `Get-Content` removed, `docs/execution/backups/` untracked and gitignored, `src/modules/README.md` and `src/shared/README.md` created, corrected forbidden-file guard passed.
 - Next: P02.4 - author `supabase/migrations/0001_schema.sql` and `0002_rls_and_policies.sql`, apply via Supabase SQL Editor, and run negative REST authorization tests.
-- Update (2026-09-17): `0001_schema.sql` and `0002_rls_and_policies.sql` applied to live project `nvpbapjfeeyrbczdvjix`. Security review findings F1-F9 resolved in `0003_security_fixes.sql`. Migration authored and ready for application. Next: apply `0003_security_fixes.sql` via Supabase SQL Editor, run negative REST tests, synthetic fixtures, authenticated tests, and concurrency validation.
+- Update (2026-09-17): `0001_schema.sql`, `0002_rls_and_policies.sql`, and `0003_security_fixes.sql` applied to live project `nvpbapjfeeyrbczdvjix`. S0 fixture counts verified 100% match. S1 negative REST tests (anon and authenticated) passed with full 42501/403 coverage. S1 concurrency gate passed: concurrent accept calls on overlapping rental windows resulted in exactly 1 winner and 1 clean 23P01 exclusion conflict; idempotency confirmed.
+
+### P02 Exit-Gate Audit (planning/04-GENERATOR-PROMPTS.md Phase P02)
+
+| Exit Gate Criterion | Status | Evidence Reference |
+|---|---|---|
+| Build & typecheck pass clean | PASS | E-016 (tsc -b and vite build PASS, 126 ms) |
+| Migrations 0001, 0002, 0003 applied to named clean project | PASS | E-018, S0 fixture confirmation (nvpbapjfeeyrbczdvjix) |
+| Negative authorization tests (anon + auth) pass | PASS | S1 output: 6 anon endpoints rejected (42501); 6 authenticated boundary tests rejected (draft invisible, non-participant tx invisible, non-owner accept 403, direct PATCH 42501) |
+| Concurrency gate: two concurrent accepted reservations | PASS | E-022: simultaneous accept_exchange_request calls; exactly 1 accepted, 1 blocked with 23P01 exclusion constraint violation |
+| Idempotency validation | PASS | E-022: same key+payload returned original response; same key+altered payload returned 23505 |
+| **P02 Final Gate Status** | **CLOSED / VERIFIED** | Transition to P03 Real Google Auth |
