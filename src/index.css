@@ -117,7 +117,13 @@ body {
   font-size: 16px;
   line-height: 1.5;
   min-height: 100vh;
+  min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -340,4 +346,14 @@ input, textarea, select {
 input:focus, textarea:focus, select:focus {
   border-color: var(--color-accent) !important;
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 25%, transparent) !important;
+}
+
+/* 9. Mobile Responsive Input Scaling (P1-UX-02) */
+/* Enforces minimum 16px font-size on mobile viewports to prevent iOS Safari auto-zoom */
+@media (max-width: 768px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
 }

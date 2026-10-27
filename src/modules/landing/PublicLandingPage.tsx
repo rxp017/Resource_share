@@ -9,7 +9,7 @@ export const PublicLandingPage: React.FC = () => {
   const { style, appearance, updatePreferences } = useTheme();
 
   return (
-    <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '40px 20px 80px' }}>
+    <main id="main-content" tabIndex={-1} style={{ maxWidth: '1000px', margin: '0 auto', padding: '40px 20px 80px' }}>
       {/* Top Floating Glass Bar */}
       <div
         className="glass-panel animate-fade-in"
@@ -382,6 +382,6 @@ export const PublicLandingPage: React.FC = () => {
           <strong style={{ color: 'var(--color-text)' }}>Academic Safety:</strong> Zero online payment gateway fees or financial escrow. Prohibited items (weapons, academic integrity violations, hazardous materials) are systematically filtered by automated moderation rules.
         </p>
       </footer>
-    </div>
+    </main>
   );
 };

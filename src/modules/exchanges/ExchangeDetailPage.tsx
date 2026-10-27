@@ -42,6 +42,15 @@ export const ExchangeDetailPage: React.FC = () => {
   const [cancelReason, setCancelReason] = useState('');
   const [refreshCounter, setRefreshCounter] = useState(0);
 
+  // Clean up object URL when proofPreview changes or component unmounts
+  useEffect(() => {
+    return () => {
+      if (proofPreview) {
+        URL.revokeObjectURL(proofPreview);
+      }
+    };
+  }, [proofPreview]);
+
   useEffect(() => {
     let isMounted = true;
     async function load() {
@@ -172,10 +181,16 @@ export const ExchangeDetailPage: React.FC = () => {
 
   // Handle proof file selection
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (proofPreview) {
+      URL.revokeObjectURL(proofPreview);
+    }
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setProofFile(file);
       setProofPreview(URL.createObjectURL(file));
+    } else {
+      setProofFile(null);
+      setProofPreview(null);
     }
   };
 
@@ -205,6 +220,9 @@ export const ExchangeDetailPage: React.FC = () => {
       );
 
       setActionSuccess('Payment proof submitted successfully. Waiting for seller acknowledgement.');
+      if (proofPreview) {
+        URL.revokeObjectURL(proofPreview);
+      }
       setProofFile(null);
       setProofPreview(null);
       setMaskedReference('');
@@ -660,16 +678,40 @@ export const ExchangeDetailPage: React.FC = () => {
                 </div>
 
                 {proofPreview && (
-                  <div style={{ marginBottom: '16px' }}>
+                  <div style={{ marginBottom: '16px', display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
                     <img
                       src={proofPreview}
                       alt="Proof preview"
                       style={{
                         maxHeight: '180px',
+                        maxWidth: '220px',
                         borderRadius: '6px',
                         border: '1px solid var(--color-border)',
+                        objectFit: 'contain',
                       }}
                     />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (proofPreview) URL.revokeObjectURL(proofPreview);
+                        setProofPreview(null);
+                        setProofFile(null);
+                      }}
+                      className="interactive-btn"
+                      style={{
+                        padding: '6px 14px',
+                        backgroundColor: '#fee2e2',
+                        color: '#b91c1c',
+                        border: '1px solid #fecaca',
+                        borderRadius: '6px',
+                        fontSize: '0.825rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        minHeight: '36px',
+                      }}
+                    >
+                      Remove Photo
+                    </button>
                   </div>
                 )}
 

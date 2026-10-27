@@ -77,10 +77,10 @@ export const SettingsPage: React.FC = () => {
         <h2 id="account-heading" style={{ fontSize: '1.1rem', marginBottom: '12px' }}>
           Campus Identity
         </h2>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', fontSize: '0.9rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', fontSize: '0.9rem' }}>
           <div>
             <span style={{ color: 'var(--color-text-muted)', display: 'block', fontSize: '0.8rem' }}>Verified Email</span>
-            <strong>{user?.email || 'Unknown'}</strong>
+            <strong style={{ wordBreak: 'break-all', overflowWrap: 'anywhere' }}>{user?.email || 'Unknown'}</strong>
           </div>
           <div>
             <span style={{ color: 'var(--color-text-muted)', display: 'block', fontSize: '0.8rem' }}>Institution</span>

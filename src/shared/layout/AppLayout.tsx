@@ -225,7 +225,10 @@ export const AppLayout: React.FC = () => {
           borderTop: '1px solid var(--color-border, #e2e8f0)',
           display: 'flex',
           justifyContent: 'space-around',
-          padding: '6px 0',
+          paddingTop: '6px',
+          paddingBottom: 'calc(6px + env(safe-area-inset-bottom, 0px))',
+          paddingLeft: 'env(safe-area-inset-left, 0px)',
+          paddingRight: 'env(safe-area-inset-right, 0px)',
           zIndex: 100,
         }}
         className="mobile-bottom-nav"
