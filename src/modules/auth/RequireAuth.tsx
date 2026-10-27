@@ -3,6 +3,7 @@ import React from 'react';
 import { Navigate, useLocation, Outlet } from 'react-router-dom';
 import { useAuth } from './useAuth';
 import { NotEligiblePage } from './NotEligiblePage';
+import { isSafeRedirect } from './redirect';
 
 export const RequireAuth: React.FC = () => {
   const { user, membership, isLoading } = useAuth();
@@ -17,9 +18,9 @@ export const RequireAuth: React.FC = () => {
   }
 
   if (!user) {
-    // Preserve same-origin deep link path
+    // Preserve same-origin deep link path using strict origin and prefix validation
     const nextPath = location.pathname + location.search;
-    if (nextPath.startsWith('/') && !nextPath.startsWith('//')) {
+    if (isSafeRedirect(nextPath)) {
       sessionStorage.setItem('rs_redirect_after_login', nextPath);
     }
     return <Navigate to={`/login?next=${encodeURIComponent(nextPath)}`} replace />;

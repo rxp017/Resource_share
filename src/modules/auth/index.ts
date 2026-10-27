@@ -9,4 +9,5 @@ export * from './NotEligiblePage';
 export * from './RequireAuth';
 export * from './RequireActiveMembership';
 export * from './RequireModerator';
+export * from './redirect';
 
