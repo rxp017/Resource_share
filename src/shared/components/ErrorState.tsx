@@ -36,13 +36,9 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
         <button
           type="button"
           onClick={onRetry}
+          className="interactive-btn btn-secondary"
           style={{
             padding: '10px 20px',
-            backgroundColor: 'var(--color-surface, #fff)',
-            color: 'var(--color-text, #201a17)',
-            border: '1px solid var(--color-border, #e2e8f0)',
-            borderRadius: 'var(--radius-btn, 6px)',
-            fontWeight: 600,
             cursor: 'pointer'
           }}
         >

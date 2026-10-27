@@ -35,13 +35,9 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         <button
           type="button"
           onClick={onAction}
+          className="interactive-btn btn-primary"
           style={{
             padding: '10px 20px',
-            backgroundColor: 'var(--color-accent, #0f766e)',
-            color: 'var(--color-accent-contrast, #fff)',
-            border: 'none',
-            borderRadius: 'var(--radius-btn, 6px)',
-            fontWeight: 600,
             cursor: 'pointer'
           }}
         >

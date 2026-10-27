@@ -326,7 +326,8 @@ button:active:not(:disabled),
   }
 }
 
-.shimmer-active {
+.shimmer-active,
+.skeleton-shimmer {
   background: linear-gradient(
     90deg,
     var(--color-bg) 25%,
@@ -335,6 +336,68 @@ button:active:not(:disabled),
   );
   background-size: 200% 100%;
   animation: skeletonShimmer 1.5s infinite linear;
+}
+
+/* Standardized Component Utility Classes */
+.btn-primary {
+  background-color: var(--color-accent);
+  color: var(--color-accent-contrast);
+  border: none;
+  border-radius: var(--radius-btn, 8px);
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 20px;
+  text-decoration: none;
+}
+
+.btn-secondary {
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-btn, 8px);
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 18px;
+  text-decoration: none;
+}
+
+.btn-ghost {
+  background-color: transparent;
+  color: var(--color-text);
+  border: none;
+  border-radius: var(--radius-btn, 8px);
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 8px 14px;
+  text-decoration: none;
+}
+
+.badge-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  color: var(--color-text-muted);
 }
 
 /* 8. Modern Input Styling */
