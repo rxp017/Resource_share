@@ -77,7 +77,7 @@ export async function fetchPublishedListings(filters: ListingFilters = {}): Prom
       }
 
       const timeoutPromise = new Promise<{ data: null; error: Error }>((resolve) =>
-        setTimeout(() => resolve({ data: null, error: new Error('Query timeout') }), 1500)
+        setTimeout(() => resolve({ data: null, error: new Error('Query timeout') }), 800)
       );
 
       const { data: listings, error } = await Promise.race([query, timeoutPromise]);

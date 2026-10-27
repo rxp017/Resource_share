@@ -1,5 +1,5 @@
 // src/modules/chat/ChatThread.tsx
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../auth';
 import { fetchMessages, sendMessage } from './api';
 import type { MessageItem } from './types';
@@ -20,7 +20,18 @@ export const ChatThread: React.FC<ChatThreadProps> = ({
   const [messages, setMessages] = useState<MessageItem[]>([]);
   const [inputText, setInputText] = useState('');
   const [isSending, setIsSending] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const isInitialLoadRef = useRef(true);
+  const prevCountRef = useRef(0);
+
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = 'smooth') => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({
+        top: scrollContainerRef.current.scrollHeight,
+        behavior,
+      });
+    }
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -30,7 +41,13 @@ export const ChatThread: React.FC<ChatThreadProps> = ({
       try {
         const list = await fetchMessages(transactionId);
         if (isMounted) {
-          setMessages(list);
+          setMessages((prev) => {
+            if (prev.length === list.length) {
+              const unchanged = prev.every((m, idx) => m.id === list[idx]?.id);
+              if (unchanged) return prev;
+            }
+            return list;
+          });
         }
       } catch (e: unknown) {
         console.warn('Could not poll chat messages:', e);
@@ -49,8 +66,26 @@ export const ChatThread: React.FC<ChatThreadProps> = ({
   }, [transactionId]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    if (messages.length === 0) return;
+
+    if (isInitialLoadRef.current) {
+      scrollToBottom('auto');
+      isInitialLoadRef.current = false;
+      prevCountRef.current = messages.length;
+      return;
+    }
+
+    if (messages.length > prevCountRef.current) {
+      prevCountRef.current = messages.length;
+      if (scrollContainerRef.current) {
+        const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
+        const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
+        if (distanceFromBottom < 120) {
+          scrollToBottom('smooth');
+        }
+      }
+    }
+  }, [messages, scrollToBottom]);
 
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [sendError, setSendError] = useState<string | null>(null);
@@ -79,6 +114,7 @@ export const ChatThread: React.FC<ChatThreadProps> = ({
       const newMsg = await sendMessage(transactionId, text);
       setMessages((prev) => [...prev, newMsg]);
       setInputText('');
+      setTimeout(() => scrollToBottom('smooth'), 50);
     } catch (err: unknown) {
       console.error('Failed to send message:', err);
       const msg = err instanceof Error ? err.message : 'Message could not be sent. Please retry.';
@@ -138,6 +174,7 @@ export const ChatThread: React.FC<ChatThreadProps> = ({
 
       {/* Messages Scroll Area */}
       <div
+        ref={scrollContainerRef}
         style={{
           padding: '18px',
           height: maxHeight,
@@ -227,7 +264,6 @@ export const ChatThread: React.FC<ChatThreadProps> = ({
             );
           })
         )}
-        <div ref={messagesEndRef} />
       </div>
 
       {/* Quick Campus Coordination Preset Chips */}

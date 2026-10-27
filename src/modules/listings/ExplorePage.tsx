@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { fetchPublishedListings } from './api';
+import { CAMPUS_SEED_LISTINGS } from './seedCatalog';
 import type { ListingItem, ListingCategory } from './types';
 import { ListingCard } from './ListingCard';
 import { Skeleton } from '../../shared/components/Skeleton';
@@ -42,8 +43,8 @@ const CATEGORIES: CategoryConfig[] = [
 
 export const ExplorePage: React.FC = () => {
   const navigate = useNavigate();
-  const [listings, setListings] = useState<ListingItem[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [listings, setListings] = useState<ListingItem[]>(CAMPUS_SEED_LISTINGS);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Filter states
@@ -58,12 +59,12 @@ export const ExplorePage: React.FC = () => {
 
   // 300ms debounce on search input to prevent query flooding
   useEffect(() => {
+    if (searchQuery === debouncedSearchQuery) return;
     const timer = setTimeout(() => {
       setDebouncedSearchQuery(searchQuery);
-      setIsLoading(true);
     }, 300);
     return () => clearTimeout(timer);
-  }, [searchQuery]);
+  }, [searchQuery, debouncedSearchQuery]);
 
   useEffect(() => {
     let isCancelled = false;
@@ -132,6 +133,7 @@ export const ExplorePage: React.FC = () => {
     setMaxSalePriceRupees('');
     setMaxRentalDailyRupees('');
     setIsLoading(true);
+    setFetchTrigger((t) => t + 1);
   };
 
   const activeFilterCount =
@@ -202,7 +204,10 @@ export const ExplorePage: React.FC = () => {
               type="search"
               placeholder="Search textbooks, calculators, lab coats, drafters..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setIsLoading(true);
+              }}
               style={{
                 width: '100%',
                 minHeight: '46px',
@@ -310,7 +315,12 @@ export const ExplorePage: React.FC = () => {
               key={cat.id}
               type="button"
               className="interactive-btn"
-              onClick={() => setSelectedCategory(cat.id)}
+              onClick={() => {
+                if (selectedCategory !== cat.id) {
+                  setSelectedCategory(cat.id);
+                  setIsLoading(true);
+                }
+              }}
               style={{
                 whiteSpace: 'nowrap',
                 flexShrink: 0,
