@@ -97,30 +97,26 @@ export const AppLayout: React.FC = () => {
 
         {/* Actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          {/* Disabled Notifications Button */}
-          <button
-            type="button"
-            disabled
-            aria-disabled="true"
-            title="Notifications service is deferred to milestone P10."
+          {/* Active Notifications Link */}
+          <Link
+            to="/notifications"
+            aria-label="Campus notifications"
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '6px',
-              padding: '6px 12px',
+              justifyContent: 'center',
               minHeight: '44px',
+              minWidth: '44px',
               backgroundColor: 'transparent',
               border: '1px solid var(--color-border)',
               borderRadius: 'var(--radius-btn, 6px)',
-              color: 'var(--color-text-muted)',
-              fontSize: '0.8rem',
-              cursor: 'not-allowed',
-              opacity: 0.8,
+              color: 'var(--color-text)',
+              fontSize: '1.1rem',
+              textDecoration: 'none',
             }}
           >
-            <span>🔔</span>
-            <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>Not available in this preview</span>
-          </button>
+            🔔
+          </Link>
 
           {/* Settings Shortcut */}
           <Link

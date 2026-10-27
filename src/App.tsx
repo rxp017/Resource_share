@@ -25,8 +25,12 @@ import {
   ExchangesListPage,
   ExchangeDetailPage,
 } from './modules/exchanges';
+import { HandoffPage } from './modules/handoff';
+import { InboxPage } from './modules/chat';
+import { NotificationsPage } from './modules/notifications';
+import { FeedbackPage, TrustProfilePage } from './modules/reviews';
+import { MembersManagementPage } from './modules/admin/MembersManagementPage';
 import { PublicLandingPage } from './modules/landing/PublicLandingPage';
-import { UnavailableState } from './shared/components/UnavailableState';
 
 export const App: React.FC = () => {
   const queryClient = useMemo(
@@ -72,89 +76,34 @@ export const App: React.FC = () => {
                       <Route path="/my/listings" element={<MyListingsPage />} />
                       <Route path="/exchanges" element={<ExchangesListPage />} />
                       <Route path="/exchanges/:id" element={<ExchangeDetailPage />} />
-                      <Route
-                        path="/profile"
-                        element={
-                          <div style={{ padding: '24px' }}>
-                            <h2>My Profile</h2>
-                          </div>
-                        }
-                      />
-                      <Route
-                        path="/profile/:userId"
-                        element={
-                          <div style={{ padding: '24px' }}>
-                            <h2>Trust Profile</h2>
-                          </div>
-                        }
-                      />
+                      <Route path="/exchanges/:id/handoff" element={<HandoffPage />} />
+
+                      {/* Messaging, Notifications & Reviews */}
+                      <Route path="/inbox" element={<InboxPage />} />
+                      <Route path="/inbox/:id" element={<InboxPage />} />
+                      <Route path="/notifications" element={<NotificationsPage />} />
+                      <Route path="/feedback" element={<FeedbackPage />} />
+                      <Route path="/profile" element={<TrustProfilePage />} />
+                      <Route path="/profile/:userId" element={<TrustProfilePage />} />
+
                       <Route
                         path="/help"
                         element={
-                          <div style={{ padding: '24px' }}>
-                            <h2>Help & Support</h2>
+                          <div style={{ padding: '32px 16px', maxWidth: '680px', margin: '0 auto' }}>
+                            <h2 style={{ fontSize: '1.4rem', fontWeight: 800, marginBottom: '8px' }}>HITAM Campus Help & Guidelines</h2>
+                            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', lineHeight: 1.5 }}>
+                              HITAM Resource Share operates strictly peer-to-peer for verified @hitam.org students.
+                              Always meet at designated campus pickup zones (Library Entrance, Canteen Plaza, Main Gate).
+                              Never exchange prohibited items or transfer off-campus funds without verifying receipt in your own UPI app.
+                            </p>
                           </div>
-                        }
-                      />
-
-                      {/* Deferred preview routes per ROUTES.md */}
-                      <Route
-                        path="/inbox"
-                        element={
-                          <UnavailableState
-                            featureName="Inbox & Chat"
-                            reason="Real-time messaging is deferred to milestone P10."
-                          />
-                        }
-                      />
-                      <Route
-                        path="/inbox/:id"
-                        element={
-                          <UnavailableState
-                            featureName="Inbox Conversation"
-                            reason="Real-time messaging is deferred to milestone P10."
-                          />
-                        }
-                      />
-                      <Route
-                        path="/notifications"
-                        element={
-                          <UnavailableState
-                            featureName="Notifications"
-                            reason="Notification service is deferred to milestone P10."
-                          />
-                        }
-                      />
-                      <Route
-                        path="/feedback"
-                        element={
-                          <UnavailableState
-                            featureName="Feedback & Reviews"
-                            reason="User ratings and reviews are deferred to milestone P11."
-                          />
-                        }
-                      />
-                      <Route
-                        path="/exchanges/:id/handoff"
-                        element={
-                          <UnavailableState
-                            featureName="QR Pickup & Handoff"
-                            reason="In-person QR token confirmation is deferred to milestone P09."
-                          />
                         }
                       />
 
                       {/* Operator / Moderator Queue */}
                       <Route element={<RequireModerator />}>
                         <Route path="/admin/moderation" element={<ModerationQueuePage />} />
-                        <Route
-                          path="/admin/members"
-                          element={
-                            <div style={{ padding: '24px' }}>
-                              <h2>Member Verification</h2>
-                            </div>
-                          }
-                        />
+                        <Route path="/admin/members" element={<MembersManagementPage />} />
                       </Route>
                     </Route>
                   </Route>

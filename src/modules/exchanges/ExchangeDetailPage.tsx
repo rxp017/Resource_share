@@ -13,6 +13,7 @@ import {
   acknowledgePayment,
 } from './api';
 import type { TransactionItem, PaymentProof } from './types';
+import { ChatThread } from '../chat/ChatThread';
 import { Skeleton } from '../../shared/components/Skeleton';
 import { ErrorState } from '../../shared/components/ErrorState';
 
@@ -934,7 +935,7 @@ export const ExchangeDetailPage: React.FC = () => {
       )}
 
       {/* 4. STATE: Seller Acknowledged (Pickup Ready) */}
-      {(transaction.status === 'seller_acknowledged' || transaction.status === 'completed') && (
+      {(transaction.status === 'seller_acknowledged' || (transaction.status === 'accepted' && transaction.mode === 'free_loan')) && (
         <div
           style={{
             backgroundColor: '#f0fdf4',
@@ -945,30 +946,134 @@ export const ExchangeDetailPage: React.FC = () => {
           }}
         >
           <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#166534', margin: '0 0 8px 0' }}>
-            ✓ Payment Acknowledged by Seller
+            ✓ Ready for In-Person Pickup Handover
           </h3>
           <p style={{ fontSize: '0.9rem', color: '#15803d', margin: '0 0 16px 0', lineHeight: 1.5 }}>
-            Payment evidence has been verified and confirmed by the payee. Both parties can now meet at the designated pickup zone for physical handoff.
+            Payment is acknowledged (or free loan active). Meet at <strong>{transaction.pickup_zone || 'HITAM Campus'}</strong> with student ID to complete physical handover.
           </p>
 
-          <div
-            style={{
-              padding: '12px 16px',
-              backgroundColor: '#ffffff',
-              borderRadius: '6px',
-              border: '1px solid #bbf7d0',
-              fontSize: '0.875rem',
-            }}
-          >
-            <strong>Pickup Location:</strong> {transaction.pickup_zone || 'HITAM Campus'}<br />
-            <span style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem' }}>
-              Bring student ID card for verification during handoff.
-            </span>
+          <div style={{ marginTop: '16px' }}>
+            <Link
+              to={`/exchanges/${transaction.id}/handoff?phase=pickup`}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '12px 24px',
+                backgroundColor: '#16a34a',
+                color: '#ffffff',
+                borderRadius: '8px',
+                fontWeight: 700,
+                fontSize: '0.95rem',
+                textDecoration: 'none',
+                boxShadow: '0 2px 6px rgba(22, 163, 74, 0.3)',
+              }}
+            >
+              📱 Launch In-Person QR Pickup Handoff →
+            </Link>
           </div>
+        </div>
+      )}
 
-          <div style={{ marginTop: '16px', fontSize: '0.8rem', color: '#15803d' }}>
-            <em>Note: In-person QR custody verification is part of the post-tomorrow roadmap. For this demonstration, payment acknowledgement marks the verified milestone.</em>
+      {/* 5. STATE: In Progress (Loan / Rental Active Custody) */}
+      {transaction.status === 'in_progress' && (
+        <div
+          style={{
+            backgroundColor: '#eff6ff',
+            border: '1px solid #bfdbfe',
+            borderRadius: 'var(--radius-card, 8px)',
+            padding: '20px',
+            marginBottom: '24px',
+          }}
+        >
+          <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#1e40af', margin: '0 0 8px 0' }}>
+            📦 Item Currently in Borrower Custody
+          </h3>
+          <p style={{ fontSize: '0.9rem', color: '#1e3a8a', margin: '0 0 16px 0', lineHeight: 1.5 }}>
+            The item was picked up successfully. Scheduled return date: <strong>{transaction.end_date || 'Agreed Date'}</strong>.
+            Meet at <strong>{transaction.pickup_zone}</strong> for return and condition check.
+          </p>
+
+          <div style={{ marginTop: '16px' }}>
+            <Link
+              to={`/exchanges/${transaction.id}/handoff?phase=return`}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '12px 24px',
+                backgroundColor: '#2563eb',
+                color: '#ffffff',
+                borderRadius: '8px',
+                fontWeight: 700,
+                fontSize: '0.95rem',
+                textDecoration: 'none',
+                boxShadow: '0 2px 6px rgba(37, 99, 235, 0.3)',
+              }}
+            >
+              🔄 Start In-Person Return & Condition Check →
+            </Link>
           </div>
+        </div>
+      )}
+
+      {/* 6. STATE: Completed */}
+      {transaction.status === 'completed' && (
+        <div
+          style={{
+            backgroundColor: '#f0fdf4',
+            border: '1px solid #bbf7d0',
+            borderRadius: 'var(--radius-card, 8px)',
+            padding: '20px',
+            marginBottom: '24px',
+          }}
+        >
+          <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#166534', margin: '0 0 8px 0' }}>
+            ✓ Exchange Completed
+          </h3>
+          <p style={{ fontSize: '0.9rem', color: '#15803d', margin: '0 0 16px 0', lineHeight: 1.5 }}>
+            Both students have verified physical handoff and completed this campus exchange.
+          </p>
+
+          <div style={{ marginTop: '12px' }}>
+            <Link
+              to="/feedback"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '10px 20px',
+                backgroundColor: '#16a34a',
+                color: '#ffffff',
+                borderRadius: '8px',
+                fontWeight: 700,
+                fontSize: '0.9rem',
+                textDecoration: 'none',
+              }}
+            >
+              ★ Rate & Review Counterparty
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {/* 7. STATE: Returned Pending Resolution (Dispute) */}
+      {transaction.status === 'returned_pending_resolution' && (
+        <div
+          style={{
+            backgroundColor: '#fffbeb',
+            border: '1px solid #fde68a',
+            borderRadius: 'var(--radius-card, 8px)',
+            padding: '20px',
+            marginBottom: '24px',
+          }}
+        >
+          <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#92400e', margin: '0 0 8px 0' }}>
+            ⚠️ Returned with Condition Dispute
+          </h3>
+          <p style={{ fontSize: '0.9rem', color: '#78350f', margin: '0 0 12px 0', lineHeight: 1.5 }}>
+            The item was physically returned to the owner, but participants recorded disagreement on its condition. A case has been submitted for campus moderator review.
+          </p>
         </div>
       )}
 
@@ -1061,6 +1166,15 @@ export const ExchangeDetailPage: React.FC = () => {
           )}
         </div>
       )}
+
+      {/* Embedded Contextual Chat */}
+      <div style={{ marginTop: '32px' }}>
+        <ChatThread
+          transactionId={transaction.id}
+          counterpartName={isOwner ? 'Student Requester' : 'Item Owner'}
+          maxHeight="320px"
+        />
+      </div>
     </div>
   );
 };

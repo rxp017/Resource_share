@@ -11,7 +11,8 @@ export type TransactionStatus =
   | 'seller_disputed'
   | 'in_progress'
   | 'completed'
-  | 'canceled';
+  | 'canceled'
+  | 'returned_pending_resolution';
 
 export type TransactionMode = 'sale' | 'free_loan' | 'rental';
 
@@ -44,6 +45,7 @@ export interface TransactionListing {
   mode: TransactionMode;
   price_paise: number;
   deposit_paise: number;
+  condition?: string;
   pickup_zone: string;
   version: number;
   media?: {
