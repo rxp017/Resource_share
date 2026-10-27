@@ -52,6 +52,7 @@ export const ChatThread: React.FC<ChatThreadProps> = ({
   }, [messages]);
 
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [sendError, setSendError] = useState<string | null>(null);
 
   const QUICK_PROMPTS = [
     '📍 Central Library Gate 2',
@@ -66,18 +67,21 @@ export const ChatThread: React.FC<ChatThreadProps> = ({
     setTimeout(() => setCopiedId(null), 1800);
   };
 
-  const handleSend = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSend = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!inputText.trim() || isSending) return;
     const text = inputText.trim();
-    setInputText('');
+    setSendError(null);
     setIsSending(true);
 
     try {
       const newMsg = await sendMessage(transactionId, text);
       setMessages((prev) => [...prev, newMsg]);
+      setInputText('');
     } catch (err: unknown) {
       console.error('Failed to send message:', err);
+      const msg = err instanceof Error ? err.message : 'Message could not be sent. Please retry.';
+      setSendError(msg);
     } finally {
       setIsSending(false);
     }
@@ -246,6 +250,42 @@ export const ChatThread: React.FC<ChatThreadProps> = ({
         ))}
       </div>
 
+      {/* Inline Send Error Banner with Retry */}
+      {sendError && (
+        <div
+          role="alert"
+          style={{
+            padding: '8px 14px',
+            backgroundColor: 'color-mix(in srgb, #ef4444 12%, transparent)',
+            borderTop: '1px solid color-mix(in srgb, #ef4444 28%, transparent)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '8px',
+            fontSize: '0.8rem',
+            color: '#b91c1c',
+          }}
+        >
+          <span>⚠️ {sendError}</span>
+          <button
+            type="button"
+            onClick={() => void handleSend()}
+            disabled={isSending || !inputText.trim()}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#b91c1c',
+              textDecoration: 'underline',
+              fontWeight: 700,
+              cursor: isSending || !inputText.trim() ? 'not-allowed' : 'pointer',
+              padding: '2px 6px',
+            }}
+          >
+            Retry
+          </button>
+        </div>
+      )}
+
       {/* Input Box */}
       <form
         onSubmit={handleSend}
@@ -260,7 +300,10 @@ export const ChatThread: React.FC<ChatThreadProps> = ({
         <input
           type="text"
           value={inputText}
-          onChange={(e) => setInputText(e.target.value)}
+          onChange={(e) => {
+            setInputText(e.target.value);
+            if (sendError) setSendError(null);
+          }}
           placeholder="Type message to coordinate..."
           maxLength={1000}
           style={{
