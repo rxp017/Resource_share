@@ -2,38 +2,62 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from './useAuth';
+import { isSafeRedirect } from './redirect';
 
 export const LoginPage: React.FC = () => {
-  const { user, membership, isLoading, signInWithGoogle } = useAuth();
+  const { user, membership, isLoading, signInWithGoogle, signOut } = useAuth();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [errorMsg, setErrorMsg] = useState<string>('');
+  const [retryAttempted, setRetryAttempted] = useState<boolean>(false);
   const [isSigningIn, setIsSigningIn] = useState<boolean>(false);
 
   const nextParam = searchParams.get('next');
 
+  // Detect OAuth / trigger rejection parameters from query string or URL hash
+  const [hasUrlError] = useState<boolean>(() => {
+    const queryError = Boolean(searchParams.get('error') || searchParams.get('error_description'));
+    let hashError = false;
+    if (typeof window !== 'undefined' && window.location.hash && window.location.hash.includes('error=')) {
+      hashError = true;
+    }
+    return queryError || hashError;
+  });
+
+  // Preserve safe ?next parameter in sessionStorage
   useEffect(() => {
-    // If nextParam is provided and safe (starts with / and not //), save it
-    if (nextParam && nextParam.startsWith('/') && !nextParam.startsWith('//')) {
-      sessionStorage.setItem('rs_redirect_after_login', nextParam);
+    if (isSafeRedirect(nextParam)) {
+      sessionStorage.setItem('rs_redirect_after_login', nextParam!);
     }
   }, [nextParam]);
 
+  // Derived state: ineligible membership or OAuth trigger error
+  const isNotEligible = !isLoading && Boolean(user && membership && !membership.eligible);
+  const showDomainError = (hasUrlError || isNotEligible) && !retryAttempted;
+
+  // External synchronization: trigger signOut and URL cleanup on domain rejection
   useEffect(() => {
-    if (!isLoading && user && membership) {
-      if (!membership.eligible) {
-        // Will be rendered as not eligible
-        return;
+    if (hasUrlError || isNotEligible) {
+      signOut().catch(() => {});
+      if (hasUrlError) {
+        const cleanSearch = isSafeRedirect(nextParam) ? `?next=${encodeURIComponent(nextParam!)}` : '';
+        window.history.replaceState({}, document.title, window.location.pathname + cleanSearch);
       }
+    }
+  }, [hasUrlError, isNotEligible, nextParam, signOut]);
+
+  // Forward active campus members onward with no redirect loop
+  useEffect(() => {
+    if (!isLoading && user && membership && membership.eligible) {
       if (membership.status === 'pending') {
         navigate('/verify', { replace: true });
         return;
       }
       if (membership.status === 'active') {
         const savedRedirect = sessionStorage.getItem('rs_redirect_after_login');
-        if (savedRedirect && savedRedirect.startsWith('/') && !savedRedirect.startsWith('//')) {
+        if (isSafeRedirect(savedRedirect)) {
           sessionStorage.removeItem('rs_redirect_after_login');
-          navigate(savedRedirect, { replace: true });
+          navigate(savedRedirect!, { replace: true });
         } else {
           navigate('/explore', { replace: true });
         }
@@ -43,6 +67,7 @@ export const LoginPage: React.FC = () => {
 
   const handleGoogleLogin = async () => {
     try {
+      setRetryAttempted(true);
       setErrorMsg('');
       setIsSigningIn(true);
       await signInWithGoogle();
@@ -108,6 +133,54 @@ export const LoginPage: React.FC = () => {
           Sign in to your account
         </h2>
 
+        {showDomainError && (
+          <div
+            role="alert"
+            style={{
+              background: 'color-mix(in srgb, #ef4444 14%, transparent)',
+              color: 'var(--color-text)',
+              border: '1px solid color-mix(in srgb, #ef4444 32%, transparent)',
+              padding: '16px 18px',
+              borderRadius: '12px',
+              fontSize: '0.92rem',
+              marginBottom: '20px',
+              textAlign: 'left',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+              <span style={{ fontSize: '1.25rem', lineHeight: 1 }} aria-hidden="true">🚫</span>
+              <div>
+                <strong style={{ display: 'block', color: '#ef4444', marginBottom: '4px' }}>
+                  College Domain Required
+                </strong>
+                <span>Only @hitam.org accounts can use this. Sign in with your college Google account.</span>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={handleGoogleLogin}
+              disabled={isSigningIn || isLoading}
+              className="interactive-btn"
+              style={{
+                alignSelf: 'flex-start',
+                padding: '8px 16px',
+                borderRadius: '8px',
+                backgroundColor: 'var(--color-accent, #2563eb)',
+                color: '#ffffff',
+                border: 'none',
+                fontWeight: 600,
+                fontSize: '0.875rem',
+                cursor: 'pointer',
+              }}
+            >
+              {isSigningIn ? 'Connecting...' : 'Retry Sign In'}
+            </button>
+          </div>
+        )}
+
         {errorMsg && (
           <div
             role="alert"
@@ -150,7 +223,7 @@ export const LoginPage: React.FC = () => {
             marginBottom: '24px',
           }}
         >
-          <svg style={{ width: '22px', height: '22px', marginRight: '12px' }} viewBox="0 0 24 24">
+          <svg style={{ width: '22px', height: '22px', marginRight: '12px' }} viewBox="0 0 24 24" aria-hidden="true">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
             <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
             <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
