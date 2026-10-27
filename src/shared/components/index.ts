@@ -5,3 +5,5 @@ export * from './ErrorState';
 export * from './ForbiddenState';
 export * from './UnavailableState';
 export * from './ItemIllustration';
+export * from './NotFoundPage';
+export * from './ErrorBoundary';

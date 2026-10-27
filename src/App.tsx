@@ -32,6 +32,7 @@ import { NotificationsPage } from './modules/notifications';
 import { FeedbackPage, TrustProfilePage } from './modules/reviews';
 import { MembersManagementPage } from './modules/admin/MembersManagementPage';
 import { PublicLandingPage } from './modules/landing/PublicLandingPage';
+import { NotFoundPage, ErrorBoundary } from './shared/components';
 
 export const App: React.FC = () => {
   const queryClient = useMemo(
@@ -52,7 +53,8 @@ export const App: React.FC = () => {
       <BrowserRouter>
         <AuthProvider onSignOutCleanup={() => queryClient.clear()}>
           <ThemeProvider>
-            <Routes>
+            <ErrorBoundary>
+              <Routes>
               {/* Public routes */}
               <Route path="/" element={<PublicLandingPage />} />
               <Route path="/login" element={<LoginPage />} />
@@ -113,18 +115,10 @@ export const App: React.FC = () => {
               </Route>
 
               {/* 404 catch-all */}
-              <Route
-                path="*"
-                element={
-                  <div style={{ maxWidth: '480px', margin: '60px auto', textAlign: 'center', padding: '24px' }}>
-                    <h1 style={{ fontSize: '2rem', marginBottom: '8px' }}>404</h1>
-                    <p style={{ color: 'var(--color-text-muted)', marginBottom: '20px' }}>Page not found</p>
-                    <Navigate to="/" replace />
-                  </div>
-                }
-              />
+              <Route path="*" element={<NotFoundPage />} />
             </Routes>
-          </ThemeProvider>
+          </ErrorBoundary>
+        </ThemeProvider>
         </AuthProvider>
       </BrowserRouter>
     </QueryClientProvider>
