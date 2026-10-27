@@ -1,7 +1,7 @@
-// src/modules/listings/ListingCard.tsx
 import React from 'react';
 import { Link } from 'react-router-dom';
 import type { ListingItem } from './types';
+import { ItemIllustration } from '../../shared/components';
 
 interface ListingCardProps {
   listing: ListingItem;
@@ -91,18 +91,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
             }}
           />
         ) : (
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              color: 'var(--color-text-muted)',
-              fontSize: '0.85rem',
-            }}
-          >
-            <span style={{ fontSize: '2.5rem', marginBottom: '4px' }}>📦</span>
-            <span style={{ fontWeight: 600 }}>Campus Item</span>
-          </div>
+          <ItemIllustration title={listing.title} category={listing.category} height="100%" />
         )}
 
         {/* Floating Mode Tag */}

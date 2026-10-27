@@ -56,6 +56,20 @@ export const LoginPage: React.FC = () => {
   return (
     <div style={{ maxWidth: '460px', margin: '60px auto', padding: '32px 24px', textAlign: 'center' }}>
       <header style={{ marginBottom: '32px' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
+          <img
+            src="/hitam-logo.png"
+            alt="HITAM Logo"
+            style={{
+              width: '80px',
+              height: '80px',
+              borderRadius: '16px',
+              objectFit: 'cover',
+              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)',
+              border: '2px solid var(--color-border)',
+            }}
+          />
+        </div>
         <div
           style={{
             display: 'inline-flex',

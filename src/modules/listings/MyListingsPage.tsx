@@ -224,6 +224,26 @@ export const MyListingsPage: React.FC = () => {
                   View
                 </Link>
 
+                <Link
+                  to={`/listings/${item.id}/edit`}
+                  style={{
+                    padding: '8px 14px',
+                    borderRadius: 'var(--radius-btn, 6px)',
+                    border: '1px solid var(--color-accent)',
+                    backgroundColor: 'var(--color-surface)',
+                    color: 'var(--color-accent)',
+                    textDecoration: 'none',
+                    fontSize: '0.85rem',
+                    fontWeight: 600,
+                    minHeight: '44px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                  }}
+                >
+                  ✏️ Edit
+                </Link>
+
                 {item.status !== 'archived' && (
                   <button
                     type="button"

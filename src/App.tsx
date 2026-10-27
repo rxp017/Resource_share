@@ -17,6 +17,7 @@ import {
   ExplorePage,
   CreateListingPage,
   ListingDetailPage,
+  EditListingPage,
   MyListingsPage,
   ModerationQueuePage,
 } from './modules/listings';
@@ -72,6 +73,7 @@ export const App: React.FC = () => {
                       <Route path="/explore" element={<ExplorePage />} />
                       <Route path="/listings/new" element={<CreateListingPage />} />
                       <Route path="/listings/:id" element={<ListingDetailPage />} />
+                      <Route path="/listings/:id/edit" element={<EditListingPage />} />
                       <Route path="/listings/:id/request" element={<RequestExchangePage />} />
                       <Route path="/my/listings" element={<MyListingsPage />} />
                       <Route path="/exchanges" element={<ExchangesListPage />} />

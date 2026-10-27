@@ -65,6 +65,19 @@ export interface CreateListingFormValues {
   photos: File[];
 }
 
+export interface EditListingFormValues {
+  title: string;
+  description: string;
+  category: ListingCategory;
+  condition: ListingCondition;
+  defects: string;
+  mode: ListingMode;
+  price_rupees: number;
+  deposit_rupees: number;
+  pickup_zone: string;
+  new_photos?: File[];
+}
+
 export interface ListingFilters {
   query?: string;
   category?: string;

@@ -70,11 +70,21 @@ export const AppLayout: React.FC = () => {
               color: 'var(--color-text)',
               display: 'flex',
               alignItems: 'center',
-              gap: '6px',
+              gap: '10px',
               minHeight: '44px',
             }}
           >
-            <span>🎓</span>
+            <img
+              src="/hitam-logo.png"
+              alt="HITAM Logo"
+              style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '6px',
+                objectFit: 'cover',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
+              }}
+            />
             <span>HITAM Share</span>
           </Link>
           <span

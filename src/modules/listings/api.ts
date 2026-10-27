@@ -5,6 +5,7 @@ import type {
   ListingMediaItem,
   ListingFilters,
   CreateListingFormValues,
+  EditListingFormValues,
 } from './types';
 import { resizeAndStripExif, uploadListingPhoto, getListingPhotoSignedUrl } from './imageUtils';
 
@@ -356,5 +357,80 @@ export async function updateListingStatus(
 
   if (error) {
     throw new Error(`Failed updating listing status: ${error.message}`);
+  }
+}
+
+/**
+ * Update an existing listing for the owner.
+ */
+export async function updateListing(
+  listingId: string,
+  values: EditListingFormValues
+): Promise<void> {
+  let pricePaise = 0;
+  if (values.mode === 'sale' || values.mode === 'rental') {
+    pricePaise = Math.round(Number(values.price_rupees) * 100);
+    if (pricePaise <= 0) {
+      throw new Error('Price must be greater than zero for sales and rentals.');
+    }
+  }
+
+  const depositPaise = values.deposit_rupees
+    ? Math.round(Number(values.deposit_rupees) * 100)
+    : 0;
+
+  const { error } = await supabase
+    .from('listings')
+    .update({
+      title: values.title.trim(),
+      description: values.description.trim(),
+      category: values.category,
+      condition: values.condition,
+      defects: values.defects.trim(),
+      mode: values.mode,
+      price_paise: pricePaise,
+      deposit_paise: depositPaise,
+      pickup_zone: values.pickup_zone || CAMPUS_PICKUP_ZONES[0],
+    })
+    .eq('id', listingId);
+
+  if (error) {
+    throw new Error(`Failed updating listing: ${error.message}`);
+  }
+
+  // Also update parent asset title & description if present
+  const { data: currentListing } = await supabase
+    .from('listings')
+    .select('asset_id, owner_id')
+    .eq('id', listingId)
+    .single();
+
+  if (currentListing?.asset_id) {
+    await supabase
+      .from('assets')
+      .update({
+        title: values.title.trim(),
+        description: values.description.trim(),
+      })
+      .eq('id', currentListing.asset_id);
+  }
+
+  // Upload new photos if provided
+  if (values.new_photos && values.new_photos.length > 0 && currentListing?.owner_id) {
+    for (let i = 0; i < values.new_photos.length; i++) {
+      const file = values.new_photos[i];
+      try {
+        const compressedBlob = await resizeAndStripExif(file);
+        const storagePath = await uploadListingPhoto(currentListing.owner_id, listingId, compressedBlob);
+
+        await supabase.from('listing_media').insert({
+          listing_id: listingId,
+          storage_path: storagePath,
+          sort_order: 10 + i,
+        });
+      } catch (uploadErr) {
+        console.error('Error uploading photo', file.name, uploadErr);
+      }
+    }
   }
 }

@@ -4,3 +4,4 @@ export * from './EmptyState';
 export * from './ErrorState';
 export * from './ForbiddenState';
 export * from './UnavailableState';
+export * from './ItemIllustration';

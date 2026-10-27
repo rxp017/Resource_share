@@ -6,6 +6,7 @@ import type { ListingItem } from './types';
 import { useAuth } from '../auth/useAuth';
 import { Skeleton } from '../../shared/components/Skeleton';
 import { ErrorState } from '../../shared/components/ErrorState';
+import { ItemIllustration } from '../../shared/components/ItemIllustration';
 
 export const ListingDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -153,10 +154,7 @@ export const ListingDetailPage: React.FC = () => {
                 style={{ width: '100%', height: '100%', objectFit: 'contain' }}
               />
             ) : (
-              <div style={{ textAlign: 'center', color: 'var(--color-text-muted)' }}>
-                <span style={{ fontSize: '3rem' }}>📦</span>
-                <p style={{ marginTop: '8px' }}>No photo uploaded</p>
-              </div>
+              <ItemIllustration title={listing.title} category={listing.category} height="100%" />
             )}
           </div>
 
@@ -345,23 +343,46 @@ export const ListingDetailPage: React.FC = () => {
               <p style={{ fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: '10px' }}>
                 You are the student owner of this listing.
               </p>
-              <Link
-                to="/my/listings"
-                className="interactive-btn"
-                style={{
-                  display: 'inline-block',
-                  padding: '10px 24px',
-                  backgroundColor: 'var(--color-accent)',
-                  color: 'var(--color-accent-contrast)',
-                  textDecoration: 'none',
-                  borderRadius: 'var(--radius-btn, 8px)',
-                  fontWeight: 700,
-                  minHeight: '44px',
-                  boxShadow: '0 4px 14px rgba(13, 148, 136, 0.25)',
-                }}
-              >
-                Manage in My Listings
-              </Link>
+              <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <Link
+                  to={`/listings/${listing.id}/edit`}
+                  className="interactive-btn"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '10px 20px',
+                    backgroundColor: 'var(--color-accent)',
+                    color: 'var(--color-accent-contrast)',
+                    textDecoration: 'none',
+                    borderRadius: 'var(--radius-btn, 8px)',
+                    fontWeight: 700,
+                    minHeight: '44px',
+                    boxShadow: '0 4px 14px rgba(13, 148, 136, 0.25)',
+                  }}
+                >
+                  ✏️ Edit Listing
+                </Link>
+                <Link
+                  to="/my/listings"
+                  className="interactive-btn"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '10px 20px',
+                    backgroundColor: 'var(--color-surface)',
+                    color: 'var(--color-text)',
+                    border: '1px solid var(--color-border)',
+                    textDecoration: 'none',
+                    borderRadius: 'var(--radius-btn, 8px)',
+                    fontWeight: 700,
+                    minHeight: '44px',
+                  }}
+                >
+                  Manage in My Listings
+                </Link>
+              </div>
             </div>
           ) : (
             <Link

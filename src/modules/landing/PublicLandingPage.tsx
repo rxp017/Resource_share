@@ -22,8 +22,18 @@ export const PublicLandingPage: React.FC = () => {
           marginBottom: '40px',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontSize: '1.25rem' }}>🎓</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <img
+            src="/hitam-logo.png"
+            alt="HITAM Logo"
+            style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '6px',
+              objectFit: 'cover',
+              boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
+            }}
+          />
           <span style={{ fontWeight: 800, fontSize: '1rem', letterSpacing: '-0.01em', color: 'var(--color-text)' }}>
             HITAM Resource Share
           </span>
@@ -108,6 +118,20 @@ export const PublicLandingPage: React.FC = () => {
 
       {/* Hero Section */}
       <header style={{ textAlign: 'center', marginBottom: '56px' }} className="animate-fade-in">
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
+          <img
+            src="/hitam-logo.png"
+            alt="HITAM Hyderabad Crest"
+            style={{
+              width: '76px',
+              height: '76px',
+              borderRadius: '16px',
+              objectFit: 'cover',
+              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)',
+              border: '2px solid var(--color-border)',
+            }}
+          />
+        </div>
         <div
           className="magic-glow"
           style={{

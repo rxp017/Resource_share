@@ -7,4 +7,5 @@ export * from './ExplorePage';
 export * from './ListingDetailPage';
 export * from './CreateListingPage';
 export * from './MyListingsPage';
+export * from './EditListingPage';
 export * from './ModerationQueuePage';
