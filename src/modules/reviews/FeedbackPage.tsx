@@ -92,12 +92,12 @@ export const FeedbackPage: React.FC = () => {
       </div>
 
       {successMsg && (
-        <div style={{ padding: '12px 16px', backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', color: '#166534', borderRadius: '8px', marginBottom: '20px', fontSize: '0.875rem' }}>
+        <div style={{ padding: '12px 16px', backgroundColor: 'color-mix(in srgb, var(--color-success) 12%, var(--color-surface))', border: '1px solid var(--color-success)', color: 'var(--color-success)', borderRadius: '8px', marginBottom: '20px', fontSize: '0.875rem', fontWeight: 600 }}>
           {successMsg}
         </div>
       )}
       {errorMsg && (
-        <div style={{ padding: '12px 16px', backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#991b1b', borderRadius: '8px', marginBottom: '20px', fontSize: '0.875rem' }}>
+        <div style={{ padding: '12px 16px', backgroundColor: 'color-mix(in srgb, var(--color-danger) 12%, var(--color-surface))', border: '1px solid var(--color-danger)', color: 'var(--color-danger)', borderRadius: '8px', marginBottom: '20px', fontSize: '0.875rem', fontWeight: 600 }}>
           {errorMsg}
         </div>
       )}
@@ -105,48 +105,64 @@ export const FeedbackPage: React.FC = () => {
       {/* Review Submission Box if an exchange is selected */}
       {selectedTxId && (
         <div
+          className="glass-panel animate-fade-in"
           style={{
-            backgroundColor: 'var(--color-surface)',
             border: '2px solid var(--color-accent)',
             borderRadius: '12px',
-            padding: '20px',
+            padding: '24px',
             marginBottom: '28px',
           }}
         >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-            <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 700, color: 'var(--color-text)' }}>
               Leave a Review for Exchange
             </h3>
             <button
               onClick={() => setSelectedTxId(null)}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.1rem' }}
+              className="interactive-btn"
+              style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: 'var(--color-text-muted)' }}
+              aria-label="Close review form"
             >
               ✕
             </button>
           </div>
 
           <form onSubmit={handleSubmitReview}>
-            {/* Interactive Star Rating */}
+            {/* Interactive Star Rating with Spring Hover */}
             <div style={{ marginBottom: '16px' }}>
-              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '6px' }}>
+              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '8px', color: 'var(--color-text)' }}>
                 Overall Rating *
               </label>
-              <div style={{ display: 'flex', gap: '8px', fontSize: '1.8rem', cursor: 'pointer' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '2rem', cursor: 'pointer' }}>
                 {[1, 2, 3, 4, 5].map((star) => (
-                  <span
+                  <button
                     key={star}
+                    type="button"
                     onMouseEnter={() => setHoverRating(star)}
                     onMouseLeave={() => setHoverRating(0)}
                     onClick={() => setRating(star)}
+                    aria-label={`Rate ${star} star${star > 1 ? 's' : ''}`}
                     style={{
-                      color: star <= (hoverRating || rating) ? '#f59e0b' : '#cbd5e1',
-                      transition: 'color 0.1s ease',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: '2px',
+                      color: star <= (hoverRating || rating) ? '#F59E0B' : 'var(--color-border)',
+                      transform: star <= (hoverRating || rating) ? 'scale(1.2)' : 'scale(1)',
+                      transition: 'transform 150ms cubic-bezier(0.16, 1, 0.3, 1), color 120ms ease',
+                      fontSize: '2rem',
+                      lineHeight: 1,
+                      minHeight: '44px',
+                      minWidth: '44px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
                     }}
                   >
                     ★
-                  </span>
+                  </button>
                 ))}
-                <span style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', alignSelf: 'center', marginLeft: '8px' }}>
+                <span style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--color-accent)', marginLeft: '12px' }}>
                   {rating === 5 ? 'Exceptional' : rating === 4 ? 'Great' : rating === 3 ? 'Satisfactory' : rating === 2 ? 'Needs Improvement' : 'Poor'}
                 </span>
               </div>

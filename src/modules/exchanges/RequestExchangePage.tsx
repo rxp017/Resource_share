@@ -413,6 +413,7 @@ export const RequestExchangePage: React.FC = () => {
         <button
           type="submit"
           disabled={isSubmitting}
+          className="interactive-btn"
           style={{
             width: '100%',
             padding: '14px 20px',
@@ -425,6 +426,7 @@ export const RequestExchangePage: React.FC = () => {
             cursor: isSubmitting ? 'not-allowed' : 'pointer',
             opacity: isSubmitting ? 0.7 : 1,
             minHeight: '48px',
+            boxShadow: '0 4px 14px rgba(13, 148, 136, 0.25)',
           }}
         >
           {isSubmitting ? 'Submitting Request...' : 'Confirm and Send Request'}

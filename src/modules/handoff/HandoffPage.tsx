@@ -32,6 +32,7 @@ export const HandoffPage: React.FC = () => {
   const [fallbackCode, setFallbackCode] = useState<string | null>(null);
   const [expiresAt, setExpiresAt] = useState<Date | null>(null);
   const [timeLeft, setTimeLeft] = useState<number>(300); // 5 mins in seconds
+  const [copiedCode, setCopiedCode] = useState(false);
 
   // Redeemer inputs
   const [inputCode, setInputCode] = useState('');
@@ -310,49 +311,89 @@ export const HandoffPage: React.FC = () => {
                 <div style={{ textAlign: 'center', marginBottom: '20px' }}>
                   {qrToken && (
                     <div
+                      className="magic-glow animate-fade-in"
                       style={{
                         display: 'inline-block',
                         padding: '16px',
                         backgroundColor: '#ffffff',
                         border: '2px solid var(--color-border)',
-                        borderRadius: '12px',
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.06)',
-                        marginBottom: '12px',
+                        borderRadius: '16px',
+                        marginBottom: '16px',
                       }}
-                      dangerouslySetInnerHTML={{ __html: generateQrSvg(qrToken, 200) }}
+                      dangerouslySetInnerHTML={{ __html: generateQrSvg(qrToken, 210) }}
                     />
                   )}
 
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '12px' }}>
-                    <span style={{ fontSize: '0.85rem', color: timeLeft < 60 ? '#dc2626' : 'var(--color-text-muted)' }}>
-                      ⏱️ Expires in: <strong>{Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}</strong>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '14px' }}>
+                    <span
+                      style={{
+                        fontSize: '0.875rem',
+                        fontWeight: 700,
+                        color: timeLeft < 60 ? 'var(--color-danger)' : 'var(--color-text)',
+                        backgroundColor: timeLeft < 60 ? 'color-mix(in srgb, var(--color-danger) 12%, transparent)' : 'var(--color-bg)',
+                        padding: '4px 12px',
+                        borderRadius: '9999px',
+                        border: '1px solid var(--color-border)',
+                      }}
+                    >
+                      ⏱️ Expires in: {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}
                     </span>
                     {timeLeft === 0 && (
                       <button
                         onClick={handleGenerate}
-                        style={{ fontSize: '0.8rem', color: 'var(--color-accent)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
+                        className="interactive-btn"
+                        style={{ fontSize: '0.85rem', color: 'var(--color-accent)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700, textDecoration: 'underline' }}
                       >
-                        Regenerate
+                        Regenerate Challenge
                       </button>
                     )}
                   </div>
 
                   {/* Fallback code for camera-less/keyboard-only */}
                   <div
+                    className="glass-panel"
                     style={{
-                      padding: '12px 16px',
-                      backgroundColor: 'var(--color-surface-subtle, #f9fafb)',
-                      border: '1px dashed var(--color-border)',
-                      borderRadius: '8px',
-                      display: 'inline-block',
+                      padding: '14px 20px',
+                      borderRadius: '10px',
+                      display: 'inline-flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '6px',
                     }}
                   >
-                    <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', display: 'block', marginBottom: '4px' }}>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontWeight: 600 }}>
                       KEYBOARD / TYPED FALLBACK CODE:
                     </span>
-                    <strong style={{ fontSize: '1.25rem', letterSpacing: '0.15em', fontFamily: 'monospace' }}>
-                      {fallbackCode}
-                    </strong>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <strong style={{ fontSize: '1.35rem', letterSpacing: '0.15em', fontFamily: 'monospace', color: 'var(--color-text)' }}>
+                        {fallbackCode}
+                      </strong>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (fallbackCode) {
+                            navigator.clipboard.writeText(fallbackCode);
+                            setCopiedCode(true);
+                            setTimeout(() => setCopiedCode(false), 2000);
+                          }
+                        }}
+                        className="interactive-btn"
+                        style={{
+                          padding: '4px 10px',
+                          fontSize: '0.75rem',
+                          fontWeight: 700,
+                          borderRadius: '6px',
+                          border: '1px solid var(--color-border)',
+                          backgroundColor: copiedCode ? 'var(--color-success)' : 'var(--color-surface)',
+                          color: copiedCode ? '#ffffff' : 'var(--color-text)',
+                          cursor: 'pointer',
+                          minHeight: '32px',
+                          minWidth: 'auto',
+                        }}
+                      >
+                        {copiedCode ? '✓ Copied!' : '📋 Copy'}
+                      </button>
+                    </div>
                   </div>
                 </div>
 

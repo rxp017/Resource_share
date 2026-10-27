@@ -72,28 +72,31 @@ export const NotificationsPage: React.FC = () => {
         {notifications.some((n) => !n.is_read) && (
           <button
             onClick={handleMarkAllRead}
+            className="interactive-btn"
             style={{
-              padding: '6px 14px',
-              backgroundColor: 'transparent',
+              padding: '8px 16px',
+              backgroundColor: 'var(--color-surface)',
               border: '1px solid var(--color-border)',
-              borderRadius: '6px',
+              borderRadius: '8px',
               fontSize: '0.825rem',
               fontWeight: 600,
               cursor: 'pointer',
+              color: 'var(--color-text)',
             }}
           >
-            Mark all read
+            ✓ Mark all read
           </button>
         )}
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', borderBottom: '1px solid var(--color-border)', paddingBottom: '8px' }}>
+      <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', borderBottom: '1px solid var(--color-border)', paddingBottom: '10px' }}>
         <button
           onClick={() => setFilter('all')}
+          className="interactive-btn"
           style={{
-            padding: '6px 14px',
-            borderRadius: '6px',
+            padding: '8px 16px',
+            borderRadius: '8px',
             border: 'none',
             backgroundColor: filter === 'all' ? 'var(--color-accent)' : 'transparent',
             color: filter === 'all' ? 'var(--color-accent-contrast)' : 'var(--color-text-muted)',
@@ -106,9 +109,10 @@ export const NotificationsPage: React.FC = () => {
         </button>
         <button
           onClick={() => setFilter('unread')}
+          className="interactive-btn"
           style={{
-            padding: '6px 14px',
-            borderRadius: '6px',
+            padding: '8px 16px',
+            borderRadius: '8px',
             border: 'none',
             backgroundColor: filter === 'unread' ? 'var(--color-accent)' : 'transparent',
             color: filter === 'unread' ? 'var(--color-accent-contrast)' : 'var(--color-text-muted)',
@@ -128,58 +132,61 @@ export const NotificationsPage: React.FC = () => {
       ) : notifications.length === 0 ? (
         <div
           style={{
-            padding: '40px 20px',
+            padding: '48px 24px',
             textAlign: 'center',
             backgroundColor: 'var(--color-surface)',
             border: '1px solid var(--color-border)',
             borderRadius: '12px',
           }}
         >
-          <div style={{ fontSize: '2rem', marginBottom: '8px' }}>🔔</div>
-          <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '6px' }}>
+          <div style={{ fontSize: '2.5rem', marginBottom: '10px' }}>🔔</div>
+          <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '6px' }}>
             No Notifications
           </h3>
-          <p style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
+          <p style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
             You're all caught up! New exchange updates will appear here.
           </p>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {notifications.map((n) => (
             <div
               key={n.id}
               onClick={() => handleCardClick(n)}
+              className="interactive-card animate-fade-in"
               style={{
-                padding: '16px',
+                padding: '16px 20px',
                 backgroundColor: n.is_read ? 'var(--color-surface)' : 'var(--color-surface-subtle, #f0fdf4)',
                 border: '1px solid var(--color-border)',
-                borderRadius: '8px',
+                borderLeft: n.is_read ? '4px solid transparent' : '4px solid var(--color-accent)',
+                borderRadius: '10px',
                 cursor: 'pointer',
-                transition: 'border-color 0.15s ease',
                 position: 'relative',
               }}
             >
               {!n.is_read && (
                 <span
+                  className="badge-pulse"
                   style={{
                     position: 'absolute',
                     top: '16px',
                     right: '16px',
-                    width: '8px',
-                    height: '8px',
+                    width: '10px',
+                    height: '10px',
                     backgroundColor: '#16a34a',
                     borderRadius: '50%',
                   }}
                 />
               )}
-              <div style={{ fontWeight: 700, fontSize: '0.925rem', marginBottom: '4px', color: 'var(--color-text)' }}>
+              <div style={{ fontWeight: 700, fontSize: '0.95rem', marginBottom: '4px', color: 'var(--color-text)' }}>
                 {n.title}
               </div>
-              <div style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginBottom: '8px', lineHeight: 1.4 }}>
+              <div style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginBottom: '8px', lineHeight: 1.45 }}>
                 {n.body}
               </div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-                {new Date(n.created_at).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}
+              <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <span>🕒</span>
+                <span>{new Date(n.created_at).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}</span>
               </div>
             </div>
           ))}

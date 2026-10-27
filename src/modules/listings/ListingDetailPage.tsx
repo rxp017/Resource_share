@@ -167,17 +167,19 @@ export const ListingDetailPage: React.FC = () => {
                 <button
                   key={p.id}
                   type="button"
+                  className="interactive-btn"
                   onClick={() => setActivePhotoIndex(idx)}
                   style={{
                     width: '64px',
                     height: '64px',
-                    borderRadius: '6px',
+                    borderRadius: '8px',
                     overflow: 'hidden',
                     border: activePhotoIndex === idx ? '2px solid var(--color-accent)' : '1px solid var(--color-border)',
                     padding: 0,
                     cursor: 'pointer',
                     minHeight: '64px',
                     minWidth: '64px',
+                    boxShadow: activePhotoIndex === idx ? '0 2px 8px rgba(13, 148, 136, 0.3)' : 'none',
                   }}
                 >
                   <img
@@ -345,15 +347,17 @@ export const ListingDetailPage: React.FC = () => {
               </p>
               <Link
                 to="/my/listings"
+                className="interactive-btn"
                 style={{
                   display: 'inline-block',
                   padding: '10px 24px',
                   backgroundColor: 'var(--color-accent)',
                   color: 'var(--color-accent-contrast)',
                   textDecoration: 'none',
-                  borderRadius: 'var(--radius-btn, 6px)',
+                  borderRadius: 'var(--radius-btn, 8px)',
                   fontWeight: 700,
                   minHeight: '44px',
+                  boxShadow: '0 4px 14px rgba(13, 148, 136, 0.25)',
                 }}
               >
                 Manage in My Listings
@@ -362,6 +366,7 @@ export const ListingDetailPage: React.FC = () => {
           ) : (
             <Link
               to={`/listings/${listing.id}/request`}
+              className="interactive-btn"
               style={{
                 display: 'block',
                 width: '100%',
@@ -374,7 +379,7 @@ export const ListingDetailPage: React.FC = () => {
                 fontWeight: 700,
                 fontSize: '1.05rem',
                 minHeight: '48px',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                boxShadow: '0 4px 14px rgba(13, 148, 136, 0.25)',
               }}
             >
               {getCtaLabel()}

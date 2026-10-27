@@ -37,6 +37,19 @@ export const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
     return cat.replace('_', ' ').toUpperCase();
   };
 
+  const getModeBadgeStyle = () => {
+    switch (listing.mode) {
+      case 'sale':
+        return { bg: 'color-mix(in srgb, var(--color-accent) 15%, var(--color-surface))', color: 'var(--color-accent)', border: 'var(--color-accent)' };
+      case 'free_loan':
+        return { bg: 'color-mix(in srgb, var(--color-success) 15%, var(--color-surface))', color: 'var(--color-success)', border: 'var(--color-success)' };
+      case 'rental':
+        return { bg: 'color-mix(in srgb, var(--color-warning) 15%, var(--color-surface))', color: 'var(--color-warning)', border: 'var(--color-warning)' };
+    }
+  };
+
+  const badgeStyle = getModeBadgeStyle();
+
   return (
     <Link
       to={`/listings/${listing.id}`}
@@ -45,20 +58,19 @@ export const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
         color: 'inherit',
         display: 'flex',
         flexDirection: 'column',
-        backgroundColor: 'var(--color-surface, #fff)',
-        border: '1px solid var(--color-border, #e2e8f0)',
-        borderRadius: 'var(--radius-card, 8px)',
+        backgroundColor: 'var(--color-surface)',
+        border: '1px solid var(--color-border)',
+        borderRadius: 'var(--radius-card, 12px)',
         overflow: 'hidden',
-        transition: 'transform 0.15s ease, box-shadow 0.15s ease',
       }}
-      className="listing-card"
+      className="interactive-card listing-card"
     >
       {/* Thumbnail */}
       <div
         style={{
           width: '100%',
-          height: '180px',
-          backgroundColor: 'var(--color-bg, #f8fafc)',
+          height: '190px',
+          backgroundColor: 'var(--color-bg)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -71,7 +83,12 @@ export const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
             src={photoUrl}
             alt={listing.title}
             loading="lazy"
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              transition: 'transform 350ms cubic-bezier(0.16, 1, 0.3, 1)',
+            }}
           />
         ) : (
           <div
@@ -79,28 +96,30 @@ export const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              color: 'var(--color-text-muted, #94a3b8)',
+              color: 'var(--color-text-muted)',
               fontSize: '0.85rem',
             }}
           >
-            <span style={{ fontSize: '2rem', marginBottom: '4px' }}>📦</span>
-            <span>No image attached</span>
+            <span style={{ fontSize: '2.5rem', marginBottom: '4px' }}>📦</span>
+            <span style={{ fontWeight: 600 }}>Campus Item</span>
           </div>
         )}
 
-        {/* Mode Tag */}
+        {/* Floating Mode Tag */}
         <span
           style={{
             position: 'absolute',
-            top: '10px',
-            left: '10px',
-            backgroundColor: 'rgba(32, 26, 23, 0.85)',
-            color: '#fff',
+            top: '12px',
+            left: '12px',
+            backgroundColor: badgeStyle.bg,
+            color: badgeStyle.color,
+            border: `1px solid ${badgeStyle.border}`,
             fontSize: '0.75rem',
-            fontWeight: 700,
-            padding: '3px 8px',
-            borderRadius: '4px',
-            backdropFilter: 'blur(4px)',
+            fontWeight: 800,
+            padding: '3px 10px',
+            borderRadius: '9999px',
+            backdropFilter: 'blur(8px)',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.08)',
           }}
         >
           {getModeLabel()}
@@ -108,14 +127,15 @@ export const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
       </div>
 
       {/* Content */}
-      <div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', flex: 1 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+      <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
           <span
             style={{
               fontSize: '0.7rem',
-              fontWeight: 700,
-              letterSpacing: '0.05em',
-              color: 'var(--color-accent, #0F766E)',
+              fontWeight: 800,
+              letterSpacing: '0.06em',
+              color: 'var(--color-accent)',
+              textTransform: 'uppercase',
             }}
           >
             {formatCategory(listing.category)}
@@ -125,7 +145,11 @@ export const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
               fontSize: '0.75rem',
               fontWeight: 600,
               textTransform: 'capitalize',
-              color: 'var(--color-text-muted, #64748b)',
+              color: 'var(--color-text-muted)',
+              backgroundColor: 'var(--color-bg)',
+              padding: '2px 8px',
+              borderRadius: '4px',
+              border: '1px solid var(--color-border)',
             }}
           >
             {listing.condition.replace('_', ' ')}
@@ -134,10 +158,10 @@ export const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
 
         <h3
           style={{
-            fontSize: '1.05rem',
+            fontSize: '1.1rem',
             fontWeight: 700,
-            marginBottom: '6px',
-            lineHeight: 1.3,
+            marginBottom: '8px',
+            lineHeight: 1.35,
             color: 'var(--color-text)',
           }}
         >
@@ -148,15 +172,16 @@ export const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
           style={{
             fontSize: '0.825rem',
             color: 'var(--color-text-muted)',
-            marginBottom: '12px',
+            marginBottom: '14px',
             marginTop: 'auto',
             display: 'flex',
             alignItems: 'center',
-            gap: '4px',
+            gap: '6px',
+            fontWeight: 500,
           }}
         >
           <span>📍</span>
-          <span>{listing.pickup_zone || 'HITAM Campus'}</span>
+          <span>{listing.pickup_zone || 'HITAM Campus Pickup'}</span>
         </p>
 
         {/* Exchange Strip */}
@@ -165,14 +190,14 @@ export const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            paddingTop: '10px',
+            paddingTop: '12px',
             borderTop: '1px solid var(--color-border)',
           }}
         >
           <span
             style={{
               fontWeight: 800,
-              fontSize: '1.05rem',
+              fontSize: '1.15rem',
               color: 'var(--color-accent)',
             }}
           >
@@ -182,11 +207,15 @@ export const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
           <span
             style={{
               fontSize: '0.75rem',
-              fontWeight: 600,
+              fontWeight: 700,
               color: 'var(--color-success)',
+              backgroundColor: 'color-mix(in srgb, var(--color-success) 12%, transparent)',
+              padding: '2px 8px',
+              borderRadius: '9999px',
+              border: '1px solid var(--color-success)',
             }}
           >
-            Available
+            ● Available
           </span>
         </div>
       </div>

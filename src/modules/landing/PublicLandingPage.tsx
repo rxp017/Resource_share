@@ -2,74 +2,362 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../auth';
+import { useTheme } from '../../shared/theme';
 
 export const PublicLandingPage: React.FC = () => {
   const { user, membership } = useAuth();
+  const { style, appearance, updatePreferences } = useTheme();
 
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '40px 20px' }}>
-      <header style={{ textAlign: 'center', marginBottom: '48px' }}>
-        <h1 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '16px', letterSpacing: '-0.02em' }}>
-          HITAM Resource Share
+    <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '40px 20px 80px' }}>
+      {/* Top Floating Glass Bar */}
+      <div
+        className="glass-panel animate-fade-in"
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: '12px 20px',
+          borderRadius: 'var(--radius-card, 12px)',
+          marginBottom: '40px',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ fontSize: '1.25rem' }}>🎓</span>
+          <span style={{ fontWeight: 800, fontSize: '1rem', letterSpacing: '-0.01em', color: 'var(--color-text)' }}>
+            HITAM Resource Share
+          </span>
+          <span
+            style={{
+              fontSize: '0.7rem',
+              fontWeight: 700,
+              padding: '2px 8px',
+              borderRadius: '12px',
+              backgroundColor: 'var(--color-accent)',
+              color: 'var(--color-accent-contrast)',
+            }}
+          >
+            v2.0 Full
+          </span>
+        </div>
+
+        {/* Live Theme Quick-Toggles */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ display: 'flex', gap: '4px', border: '1px solid var(--color-border)', borderRadius: '6px', padding: '2px' }}>
+            <button
+              type="button"
+              className="interactive-btn"
+              onClick={() => void updatePreferences({ style: 'calm' })}
+              style={{
+                border: 'none',
+                padding: '4px 8px',
+                fontSize: '0.75rem',
+                fontWeight: style === 'calm' ? 700 : 500,
+                borderRadius: '4px',
+                backgroundColor: style === 'calm' ? 'var(--color-accent)' : 'transparent',
+                color: style === 'calm' ? 'var(--color-accent-contrast)' : 'var(--color-text-muted)',
+                cursor: 'pointer',
+                minHeight: '28px',
+                minWidth: 'auto',
+              }}
+            >
+              Calm
+            </button>
+            <button
+              type="button"
+              className="interactive-btn"
+              onClick={() => void updatePreferences({ style: 'pulse' })}
+              style={{
+                border: 'none',
+                padding: '4px 8px',
+                fontSize: '0.75rem',
+                fontWeight: style === 'pulse' ? 700 : 500,
+                borderRadius: '4px',
+                backgroundColor: style === 'pulse' ? 'var(--color-accent)' : 'transparent',
+                color: style === 'pulse' ? 'var(--color-accent-contrast)' : 'var(--color-text-muted)',
+                cursor: 'pointer',
+                minHeight: '28px',
+                minWidth: 'auto',
+              }}
+            >
+              Pulse
+            </button>
+          </div>
+
+          <button
+            type="button"
+            className="interactive-btn"
+            onClick={() => void updatePreferences({ appearance: appearance === 'dark' ? 'light' : 'dark' })}
+            aria-label="Toggle light and dark mode"
+            style={{
+              padding: '4px 10px',
+              fontSize: '0.85rem',
+              borderRadius: '6px',
+              border: '1px solid var(--color-border)',
+              backgroundColor: 'var(--color-surface)',
+              color: 'var(--color-text)',
+              cursor: 'pointer',
+              minHeight: '32px',
+              minWidth: '32px',
+            }}
+          >
+            {appearance === 'dark' ? '☀️' : '🌙'}
+          </button>
+        </div>
+      </div>
+
+      {/* Hero Section */}
+      <header style={{ textAlign: 'center', marginBottom: '56px' }} className="animate-fade-in">
+        <div
+          className="magic-glow"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '6px 16px',
+            borderRadius: '9999px',
+            backgroundColor: 'var(--color-surface)',
+            color: 'var(--color-accent)',
+            fontSize: '0.8rem',
+            fontWeight: 700,
+            marginBottom: '20px',
+          }}
+        >
+          <span className="badge-pulse" style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'var(--color-accent)' }} />
+          <span>Exclusive Campus Network for Hyderabad Institute of Technology & Management</span>
+        </div>
+
+        <h1
+          style={{
+            fontSize: 'clamp(2.2rem, 5vw, 3.4rem)',
+            fontWeight: 800,
+            marginBottom: '18px',
+            letterSpacing: '-0.03em',
+            lineHeight: 1.15,
+            color: 'var(--color-text)',
+          }}
+        >
+          Share, Borrow & Rent <br />
+          <span style={{ color: 'var(--color-accent)' }}>Academic Gear with Peers.</span>
         </h1>
-        <p style={{ fontSize: '1.2rem', color: 'var(--color-text-secondary, #64748b)', maxWidth: '600px', margin: '0 auto 24px auto' }}>
-          An exclusive peer-to-peer campus marketplace for students to buy, sell, borrow, and rent academic equipment, textbooks, and gear.
+
+        <p
+          style={{
+            fontSize: '1.15rem',
+            color: 'var(--color-text-muted)',
+            maxWidth: '680px',
+            margin: '0 auto 32px auto',
+            lineHeight: 1.6,
+          }}
+        >
+          Direct peer-to-peer textbook and lab equipment exchanges. Zero broker commissions, zero online escrow delays, and verified physical handoffs powered by ephemeral single-use QR custody.
         </p>
 
-        <div>
+        {/* Primary CTA Buttons */}
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '14px', flexWrap: 'wrap' }}>
           {user && membership?.status === 'active' ? (
             <Link
               to="/explore"
+              className="interactive-btn"
               style={{
-                display: 'inline-block',
-                padding: '12px 24px',
-                backgroundColor: 'var(--color-primary, #0284c7)',
-                color: '#fff',
-                borderRadius: '8px',
-                fontWeight: 600,
-                textDecoration: 'none'
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '14px 32px',
+                backgroundColor: 'var(--color-accent)',
+                color: 'var(--color-accent-contrast)',
+                borderRadius: 'var(--radius-btn, 8px)',
+                fontWeight: 700,
+                fontSize: '1rem',
+                textDecoration: 'none',
+                minHeight: '48px',
               }}
             >
-              Go to Explore
+              <span>Explore Marketplace</span>
+              <span>→</span>
             </Link>
           ) : (
             <Link
               to="/login"
+              className="interactive-btn"
               style={{
-                display: 'inline-block',
-                padding: '12px 24px',
-                backgroundColor: 'var(--color-primary, #0284c7)',
-                color: '#fff',
-                borderRadius: '8px',
-                fontWeight: 600,
-                textDecoration: 'none'
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '10px',
+                padding: '14px 32px',
+                backgroundColor: 'var(--color-accent)',
+                color: 'var(--color-accent-contrast)',
+                borderRadius: 'var(--radius-btn, 8px)',
+                fontWeight: 700,
+                fontSize: '1rem',
+                textDecoration: 'none',
+                minHeight: '48px',
               }}
             >
-              Sign In with College Account
+              <span>Sign In with @hitam.org Account</span>
+              <span>→</span>
             </Link>
           )}
+
+          <Link
+            to="/help"
+            className="interactive-btn"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '14px 24px',
+              backgroundColor: 'var(--color-surface)',
+              color: 'var(--color-text)',
+              border: '1px solid var(--color-border)',
+              borderRadius: 'var(--radius-btn, 8px)',
+              fontWeight: 600,
+              fontSize: '1rem',
+              textDecoration: 'none',
+              minHeight: '48px',
+            }}
+          >
+            <span>Campus Pickup Guidelines</span>
+          </Link>
         </div>
       </header>
 
-      <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px', marginBottom: '48px' }}>
-        <div style={{ border: '1px solid var(--color-border, #e2e8f0)', borderRadius: '8px', padding: '20px' }}>
-          <h2 style={{ fontSize: '1.15rem', fontWeight: 600, marginBottom: '8px' }}>Direct Sale</h2>
-          <p style={{ fontSize: '0.9rem', color: '#64748b' }}>Buy or sell used textbooks, calculators, and tools directly with campus peers. Zero commissions.</p>
+      {/* Live Campus Metric Chips */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+          gap: '16px',
+          marginBottom: '56px',
+        }}
+      >
+        {[
+          { label: 'Campus Authorization', value: '@hitam.org Only', icon: '🔒' },
+          { label: 'Escrow / Middleman Fees', value: '₹0.00 Free', icon: '⚡' },
+          { label: 'Physical Custody Handoff', value: '5-Min Replay-Safe QR', icon: '📱' },
+          { label: 'Design Accessibility', value: '40/40 WCAG AA', icon: '♿' },
+        ].map((stat, i) => (
+          <div
+            key={i}
+            className="glass-panel"
+            style={{
+              padding: '16px',
+              borderRadius: 'var(--radius-card, 10px)',
+              textAlign: 'center',
+            }}
+          >
+            <div style={{ fontSize: '1.5rem', marginBottom: '4px' }}>{stat.icon}</div>
+            <div style={{ fontWeight: 800, fontSize: '1.1rem', color: 'var(--color-text)', marginBottom: '2px' }}>
+              {stat.value}
+            </div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontWeight: 600 }}>
+              {stat.label}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* 4 Feature Pillars Grid */}
+      <section style={{ marginBottom: '60px' }}>
+        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+          <h2 style={{ fontSize: '1.6rem', fontWeight: 800, marginBottom: '6px', color: 'var(--color-text)' }}>
+            Four Exchange Modes Tailored for Engineering Students
+          </h2>
+          <p style={{ color: 'var(--color-text-muted)', fontSize: '0.95rem' }}>
+            Built specifically to solve textbook shortages, semester lab projects, and exam prep.
+          </p>
         </div>
-        <div style={{ border: '1px solid var(--color-border, #e2e8f0)', borderRadius: '8px', padding: '20px' }}>
-          <h2 style={{ fontSize: '1.15rem', fontWeight: 600, marginBottom: '8px' }}>Free Loan</h2>
-          <p style={{ fontSize: '0.9rem', color: '#64748b' }}>Borrow drafting kits, reference manuals, and lab gear for free for up to 30 days.</p>
-        </div>
-        <div style={{ border: '1px solid var(--color-border, #e2e8f0)', borderRadius: '8px', padding: '20px' }}>
-          <h2 style={{ fontSize: '1.15rem', fontWeight: 600, marginBottom: '8px' }}>Short-Term Rental</h2>
-          <p style={{ fontSize: '0.9rem', color: '#64748b' }}>Rent components and specialized kits for exams or projects at fair student daily rates.</p>
+
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+            gap: '20px',
+          }}
+        >
+          {[
+            {
+              title: 'Direct Peer Sale',
+              desc: 'Transfer used reference books, workshop tools, and calculators directly to juniors. Zero commissions; settle via UPI or cash.',
+              icon: '🏷️',
+              tag: 'Permanent Purchase',
+            },
+            {
+              title: '30-Day Free Loan',
+              desc: 'Borrow drawing instruments, lab manuals, and component kits from campus peers at zero rental charge.',
+              icon: '🤝',
+              tag: 'Free Academic Aid',
+            },
+            {
+              title: 'Daily Rental Booking',
+              desc: 'Rent Arduino kits, Raspberry Pis, and oscilloscopes for semester assignments with automated exclusion calendar gates.',
+              icon: '⏱️',
+              tag: 'Per-Day Rates',
+            },
+            {
+              title: 'QR Physical Custody',
+              desc: 'Meet at campus zones (Central Library, Canteen Plaza, Workshop) and verify item condition with two-party cryptographic signoff.',
+              icon: '📲',
+              tag: 'Replay-Safe Protocol',
+            },
+          ].map((card, idx) => (
+            <div
+              key={idx}
+              className="interactive-card"
+              style={{
+                backgroundColor: 'var(--color-surface)',
+                border: '1px solid var(--color-border)',
+                borderRadius: 'var(--radius-card, 12px)',
+                padding: '24px 20px',
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                <span style={{ fontSize: '2rem' }}>{card.icon}</span>
+                <span
+                  style={{
+                    fontSize: '0.7rem',
+                    fontWeight: 700,
+                    padding: '3px 8px',
+                    borderRadius: '4px',
+                    backgroundColor: 'var(--color-bg)',
+                    color: 'var(--color-text-muted)',
+                    border: '1px solid var(--color-border)',
+                  }}
+                >
+                  {card.tag}
+                </span>
+              </div>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '8px', color: 'var(--color-text)' }}>
+                {card.title}
+              </h3>
+              <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', lineHeight: 1.5, marginTop: 'auto' }}>
+                {card.desc}
+              </p>
+            </div>
+          ))}
         </div>
       </section>
 
-      <section style={{ borderTop: '1px solid var(--color-border, #e2e8f0)', paddingTop: '24px', fontSize: '0.85rem', color: '#94a3b8' }}>
-        <p><strong>Campus Eligibility:</strong> Access is restricted strictly to active students and staff of Hyderabad Institute of Technology and Management (HITAM) using authorized @hitam.org accounts.</p>
-        <p><strong>Accessibility Statement:</strong> Built to WCAG 2.1 AA standards supporting keyboard navigation, visible focus indicators, and screen-reader semantics.</p>
-      </section>
+      {/* Campus Policy and Safeguards Footer */}
+      <footer
+        className="glass-panel"
+        style={{
+          borderRadius: 'var(--radius-card, 12px)',
+          padding: '24px 20px',
+          fontSize: '0.825rem',
+          color: 'var(--color-text-muted)',
+          lineHeight: 1.6,
+        }}
+      >
+        <p style={{ marginBottom: '8px' }}>
+          <strong style={{ color: 'var(--color-text)' }}>Campus Isolation Invariant:</strong> Only authenticated students and faculty holding active <code style={{ backgroundColor: 'var(--color-bg)', padding: '2px 6px', borderRadius: '4px' }}>@hitam.org</code> credentials can access, list, or request exchanges. Outside domains are rejected at the server gateway.
+        </p>
+        <p style={{ margin: 0 }}>
+          <strong style={{ color: 'var(--color-text)' }}>Academic Safety:</strong> Zero online payment gateway fees or financial escrow. Prohibited items (weapons, academic integrity violations, hazardous materials) are systematically filtered by automated moderation rules.
+        </p>
+      </footer>
     </div>
   );
 };

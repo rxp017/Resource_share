@@ -63,30 +63,33 @@ export const InboxPage: React.FC = () => {
           </p>
           <button
             onClick={() => navigate('/explore')}
+            className="interactive-btn"
             style={{
-              padding: '10px 20px',
+              padding: '12px 24px',
               backgroundColor: 'var(--color-accent)',
               color: 'var(--color-accent-contrast)',
-              borderRadius: '6px',
+              borderRadius: '8px',
               border: 'none',
               fontWeight: 700,
               cursor: 'pointer',
+              fontSize: '0.95rem',
             }}
           >
-            Explore Campus Listings
+            Explore Campus Listings →
           </button>
         </div>
       ) : (
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'minmax(260px, 320px) 1fr',
+            gridTemplateColumns: 'minmax(280px, 340px) 1fr',
             gap: '16px',
             backgroundColor: 'var(--color-surface)',
             border: '1px solid var(--color-border)',
             borderRadius: '12px',
             overflow: 'hidden',
-            minHeight: '500px',
+            minHeight: '520px',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.04)',
           }}
         >
           {/* Conversation List */}
@@ -94,11 +97,34 @@ export const InboxPage: React.FC = () => {
             style={{
               borderRight: '1px solid var(--color-border)',
               overflowY: 'auto',
-              maxHeight: '600px',
+              maxHeight: '620px',
             }}
           >
-            <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--color-border)', fontWeight: 700, fontSize: '0.875rem' }}>
-              Conversations ({conversations.length})
+            <div
+              style={{
+                padding: '14px 18px',
+                borderBottom: '1px solid var(--color-border)',
+                fontWeight: 800,
+                fontSize: '0.875rem',
+                backgroundColor: 'var(--color-surface-subtle, #f8fafc)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
+            >
+              <span>Conversations</span>
+              <span
+                style={{
+                  fontSize: '0.75rem',
+                  padding: '2px 8px',
+                  borderRadius: '999px',
+                  backgroundColor: 'var(--color-accent)',
+                  color: 'var(--color-accent-contrast)',
+                  fontWeight: 700,
+                }}
+              >
+                {conversations.length}
+              </span>
             </div>
             {conversations.map((c) => {
               const isSelected = c.transaction_id === activeTxId;
@@ -106,24 +132,36 @@ export const InboxPage: React.FC = () => {
                 <div
                   key={c.transaction_id}
                   onClick={() => navigate(`/inbox/${c.transaction_id}`)}
+                  className="interactive-card"
                   style={{
                     padding: '14px 16px',
                     borderBottom: '1px solid var(--color-border)',
                     cursor: 'pointer',
-                    backgroundColor: isSelected ? 'var(--color-surface-subtle, #f8fafc)' : 'transparent',
+                    backgroundColor: isSelected ? 'var(--color-surface-subtle, #f8fafc)' : 'var(--color-surface)',
                     borderLeft: isSelected ? '4px solid var(--color-accent)' : '4px solid transparent',
+                    transition: 'background-color 0.15s ease, border-left-color 0.15s ease',
                   }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                    <span style={{ fontWeight: 700, fontSize: '0.875rem', color: 'var(--color-text)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', alignItems: 'center' }}>
+                    <span style={{ fontWeight: isSelected ? 800 : 700, fontSize: '0.9rem', color: 'var(--color-text)' }}>
                       {c.listing_title}
                     </span>
-                    <span style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>
+                    <span
+                      style={{
+                        fontSize: '0.7rem',
+                        padding: '2px 6px',
+                        borderRadius: '4px',
+                        backgroundColor: 'var(--color-surface-subtle, #f1f5f9)',
+                        color: 'var(--color-text-muted)',
+                        textTransform: 'uppercase',
+                        fontWeight: 600,
+                      }}
+                    >
                       {c.status}
                     </span>
                   </div>
                   <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {c.counterpart_name}: {c.last_message}
+                    <strong style={{ color: 'var(--color-text)' }}>{c.counterpart_name}:</strong> {c.last_message}
                   </div>
                 </div>
               );
@@ -134,29 +172,47 @@ export const InboxPage: React.FC = () => {
           <div style={{ padding: '16px', display: 'flex', flexDirection: 'column' }}>
             {activeTxId ? (
               <div>
-                <div style={{ marginBottom: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontWeight: 700, fontSize: '1rem' }}>
-                    {activeConvo?.listing_title}
-                  </span>
+                <div
+                  style={{
+                    marginBottom: '12px',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    paddingBottom: '8px',
+                    borderBottom: '1px solid var(--color-border)',
+                  }}
+                >
+                  <div>
+                    <span style={{ fontWeight: 800, fontSize: '1.05rem', color: 'var(--color-text)' }}>
+                      {activeConvo?.listing_title}
+                    </span>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', display: 'block' }}>
+                      Coordinating exchange with {activeConvo?.counterpart_name}
+                    </span>
+                  </div>
                   <button
                     onClick={() => navigate(`/exchanges/${activeTxId}`)}
+                    className="interactive-btn"
                     style={{
                       fontSize: '0.8rem',
                       color: 'var(--color-accent)',
-                      background: 'none',
-                      border: 'none',
+                      background: 'var(--color-surface-subtle, #f8fafc)',
+                      border: '1px solid var(--color-border)',
+                      borderRadius: '6px',
+                      padding: '6px 12px',
                       cursor: 'pointer',
-                      textDecoration: 'underline',
+                      fontWeight: 600,
                     }}
                   >
                     View Exchange Record →
                   </button>
                 </div>
-                <ChatThread transactionId={activeTxId} maxHeight="450px" />
+                <ChatThread transactionId={activeTxId} counterpartName={activeConvo?.counterpart_name} maxHeight="450px" />
               </div>
             ) : (
-              <div style={{ margin: 'auto', color: 'var(--color-text-muted)' }}>
-                Select a conversation on the left to start chatting.
+              <div style={{ margin: 'auto', textAlign: 'center', color: 'var(--color-text-muted)', padding: '40px' }}>
+                <div style={{ fontSize: '2rem', marginBottom: '8px' }}>👈</div>
+                <p>Select a conversation on the left to start coordinating.</p>
               </div>
             )}
           </div>

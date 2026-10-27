@@ -517,15 +517,17 @@ export const ExchangeDetailPage: React.FC = () => {
                 <button
                   onClick={handleAccept}
                   disabled={isProcessing}
+                  className="interactive-btn"
                   style={{
                     padding: '10px 24px',
                     backgroundColor: 'var(--color-accent)',
                     color: 'var(--color-accent-contrast)',
                     border: 'none',
-                    borderRadius: 'var(--radius-btn, 6px)',
+                    borderRadius: 'var(--radius-btn, 8px)',
                     fontWeight: 700,
                     cursor: isProcessing ? 'not-allowed' : 'pointer',
                     minHeight: '44px',
+                    boxShadow: '0 4px 14px rgba(13, 148, 136, 0.25)',
                   }}
                 >
                   {isProcessing ? 'Processing...' : 'Accept Exchange Request'}
@@ -534,12 +536,13 @@ export const ExchangeDetailPage: React.FC = () => {
                 <button
                   onClick={handleDecline}
                   disabled={isProcessing}
+                  className="interactive-btn"
                   style={{
                     padding: '10px 20px',
                     backgroundColor: 'transparent',
                     color: '#dc2626',
                     border: '1px solid #f87171',
-                    borderRadius: 'var(--radius-btn, 6px)',
+                    borderRadius: 'var(--radius-btn, 8px)',
                     fontWeight: 600,
                     cursor: isProcessing ? 'not-allowed' : 'pointer',
                     minHeight: '44px',
@@ -560,12 +563,13 @@ export const ExchangeDetailPage: React.FC = () => {
               <button
                 onClick={handleWithdraw}
                 disabled={isProcessing}
+                className="interactive-btn"
                 style={{
                   padding: '10px 20px',
                   backgroundColor: 'transparent',
                   color: 'var(--color-text-muted)',
                   border: '1px solid var(--color-border)',
-                  borderRadius: 'var(--radius-btn, 6px)',
+                  borderRadius: 'var(--radius-btn, 8px)',
                   fontWeight: 600,
                   cursor: isProcessing ? 'not-allowed' : 'pointer',
                   minHeight: '44px',
@@ -698,16 +702,18 @@ export const ExchangeDetailPage: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isProcessing || !proofFile}
+                  className="interactive-btn"
                   style={{
                     padding: '12px 24px',
                     backgroundColor: 'var(--color-accent)',
                     color: 'var(--color-accent-contrast)',
                     border: 'none',
-                    borderRadius: 'var(--radius-btn, 6px)',
+                    borderRadius: 'var(--radius-btn, 8px)',
                     fontWeight: 700,
                     cursor: isProcessing || !proofFile ? 'not-allowed' : 'pointer',
                     opacity: isProcessing || !proofFile ? 0.6 : 1,
                     minHeight: '44px',
+                    boxShadow: '0 4px 14px rgba(13, 148, 136, 0.25)',
                   }}
                 >
                   {isProcessing ? 'Uploading Proof...' : 'Submit Payment Proof'}
@@ -836,15 +842,17 @@ export const ExchangeDetailPage: React.FC = () => {
                       <button
                         onClick={() => handleAcknowledge('acknowledged')}
                         disabled={isProcessing}
+                        className="interactive-btn"
                         style={{
                           padding: '10px 20px',
                           backgroundColor: '#16a34a',
                           color: '#ffffff',
                           border: 'none',
-                          borderRadius: 'var(--radius-btn, 6px)',
+                          borderRadius: 'var(--radius-btn, 8px)',
                           fontWeight: 700,
                           cursor: isProcessing ? 'not-allowed' : 'pointer',
                           minHeight: '44px',
+                          boxShadow: '0 4px 14px rgba(22, 163, 74, 0.25)',
                         }}
                       >
                         {isProcessing ? 'Updating...' : 'Acknowledge Payment Received'}
@@ -853,12 +861,13 @@ export const ExchangeDetailPage: React.FC = () => {
                       <button
                         onClick={() => setShowDisputeInput(true)}
                         disabled={isProcessing}
+                        className="interactive-btn"
                         style={{
                           padding: '10px 18px',
                           backgroundColor: 'transparent',
                           color: '#dc2626',
                           border: '1px solid #f87171',
-                          borderRadius: 'var(--radius-btn, 6px)',
+                          borderRadius: 'var(--radius-btn, 8px)',
                           fontWeight: 600,
                           cursor: isProcessing ? 'not-allowed' : 'pointer',
                           minHeight: '44px',
@@ -955,6 +964,7 @@ export const ExchangeDetailPage: React.FC = () => {
           <div style={{ marginTop: '16px' }}>
             <Link
               to={`/exchanges/${transaction.id}/handoff?phase=pickup`}
+              className="interactive-btn"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -997,6 +1007,7 @@ export const ExchangeDetailPage: React.FC = () => {
           <div style={{ marginTop: '16px' }}>
             <Link
               to={`/exchanges/${transaction.id}/handoff?phase=return`}
+              className="interactive-btn"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -1038,6 +1049,7 @@ export const ExchangeDetailPage: React.FC = () => {
           <div style={{ marginTop: '12px' }}>
             <Link
               to="/feedback"
+              className="interactive-btn"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',

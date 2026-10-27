@@ -530,6 +530,7 @@ export const CreateListingPage: React.FC = () => {
           <button
             type="submit"
             disabled={isSubmitting}
+            className="interactive-btn"
             style={{
               width: '100%',
               padding: '12px 24px',
@@ -542,6 +543,7 @@ export const CreateListingPage: React.FC = () => {
               cursor: isSubmitting ? 'wait' : 'pointer',
               minHeight: '48px',
               opacity: isSubmitting ? 0.7 : 1,
+              boxShadow: '0 4px 14px rgba(13, 148, 136, 0.25)',
             }}
           >
             {isSubmitting ? 'Compressing photos & publishing listing...' : 'Publish Listing'}

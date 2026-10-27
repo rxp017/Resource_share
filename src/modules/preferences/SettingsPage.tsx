@@ -298,16 +298,18 @@ export const SettingsPage: React.FC = () => {
           <button
             type="submit"
             disabled={isSaving}
+            className="interactive-btn"
             style={{
               padding: '10px 24px',
               backgroundColor: 'var(--color-accent)',
               color: 'var(--color-accent-contrast)',
               border: 'none',
-              borderRadius: 'var(--radius-btn, 6px)',
+              borderRadius: 'var(--radius-btn, 8px)',
               fontWeight: 700,
               fontSize: '1rem',
               cursor: isSaving ? 'wait' : 'pointer',
               minHeight: '44px',
+              boxShadow: '0 4px 14px rgba(13, 148, 136, 0.25)',
             }}
           >
             {isSaving ? 'Saving...' : 'Save Preferences'}
@@ -316,12 +318,13 @@ export const SettingsPage: React.FC = () => {
           <button
             type="button"
             onClick={signOut}
+            className="interactive-btn"
             style={{
               padding: '10px 20px',
               backgroundColor: 'transparent',
               color: 'var(--color-danger, #B91C1C)',
               border: '1px solid var(--color-border)',
-              borderRadius: 'var(--radius-btn, 6px)',
+              borderRadius: 'var(--radius-btn, 8px)',
               fontWeight: 600,
               fontSize: '0.95rem',
               cursor: 'pointer',

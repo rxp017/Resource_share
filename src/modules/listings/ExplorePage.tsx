@@ -121,6 +121,7 @@ export const ExplorePage: React.FC = () => {
 
         <Link
           to="/listings/new"
+          className="interactive-btn"
           style={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -129,10 +130,11 @@ export const ExplorePage: React.FC = () => {
             color: 'var(--color-accent-contrast)',
             textDecoration: 'none',
             padding: '10px 20px',
-            borderRadius: 'var(--radius-btn, 6px)',
+            borderRadius: 'var(--radius-btn, 8px)',
             fontWeight: 700,
             fontSize: '0.95rem',
             minHeight: '44px',
+            boxShadow: '0 4px 14px rgba(13, 148, 136, 0.25)',
           }}
         >
           <span>➕</span>
@@ -142,31 +144,61 @@ export const ExplorePage: React.FC = () => {
 
       {/* Search Bar */}
       <form onSubmit={handleSearchSubmit} style={{ marginBottom: '20px' }}>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <input
-            type="search"
-            placeholder="Search textbooks, calculators, lab coats, drafters..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{
-              flex: 1,
-              minHeight: '44px',
-              padding: '8px 16px',
-              borderRadius: 'var(--radius-btn, 6px)',
-              border: '1px solid var(--color-border)',
-              backgroundColor: 'var(--color-surface)',
-              color: 'var(--color-text)',
-              fontSize: '1rem',
-            }}
-          />
+        <div style={{ display: 'flex', gap: '8px', position: 'relative' }}>
+          <div style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center' }}>
+            <input
+              type="search"
+              placeholder="Search textbooks, calculators, lab coats, drafters..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{
+                width: '100%',
+                minHeight: '44px',
+                padding: '8px 40px 8px 16px',
+                borderRadius: 'var(--radius-btn, 8px)',
+                border: '1px solid var(--color-border)',
+                backgroundColor: 'var(--color-surface)',
+                color: 'var(--color-text)',
+                fontSize: '1rem',
+                outline: 'none',
+              }}
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchQuery('');
+                  setFetchTrigger((t) => t + 1);
+                }}
+                className="interactive-btn"
+                title="Clear search"
+                style={{
+                  position: 'absolute',
+                  right: '12px',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: 'var(--color-text-muted)',
+                  fontSize: '1rem',
+                  padding: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                ✕
+              </button>
+            )}
+          </div>
           <button
             type="submit"
+            className="interactive-btn"
             style={{
               padding: '8px 24px',
               backgroundColor: 'var(--color-accent)',
               color: 'var(--color-accent-contrast)',
               border: 'none',
-              borderRadius: 'var(--radius-btn, 6px)',
+              borderRadius: 'var(--radius-btn, 8px)',
               fontWeight: 700,
               cursor: 'pointer',
               minHeight: '44px',
@@ -192,11 +224,12 @@ export const ExplorePage: React.FC = () => {
           <button
             key={cat.id}
             type="button"
+            className="interactive-btn"
             onClick={() => setSelectedCategory(cat.id)}
             style={{
               whiteSpace: 'nowrap',
-              padding: '6px 14px',
-              borderRadius: '20px',
+              padding: '6px 16px',
+              borderRadius: '999px',
               border: '1px solid var(--color-border)',
               backgroundColor:
                 selectedCategory === cat.id ? 'var(--color-accent)' : 'var(--color-surface)',
@@ -206,6 +239,7 @@ export const ExplorePage: React.FC = () => {
               fontSize: '0.85rem',
               cursor: 'pointer',
               minHeight: '44px',
+              boxShadow: selectedCategory === cat.id ? '0 2px 8px rgba(13, 148, 136, 0.25)' : 'none',
             }}
           >
             {cat.label}
@@ -218,31 +252,33 @@ export const ExplorePage: React.FC = () => {
         style={{
           backgroundColor: 'var(--color-surface)',
           border: '1px solid var(--color-border)',
-          borderRadius: 'var(--radius-card, 8px)',
-          padding: '16px',
+          borderRadius: 'var(--radius-card, 12px)',
+          padding: '16px 20px',
           marginBottom: '28px',
           display: 'flex',
           flexWrap: 'wrap',
           gap: '20px',
           alignItems: 'center',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.02)',
         }}
       >
         {/* Mode Selector */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Type:</span>
+          <span style={{ fontSize: '0.85rem', fontWeight: 700 }}>Type:</span>
           {(['all', 'sale', 'rental', 'free_loan'] as const).map((m) => (
             <button
               key={m}
               type="button"
+              className="interactive-btn"
               onClick={() => setSelectedMode(m)}
               style={{
-                padding: '4px 12px',
-                borderRadius: 'var(--radius-btn, 6px)',
+                padding: '6px 14px',
+                borderRadius: 'var(--radius-btn, 8px)',
                 border: selectedMode === m ? '2px solid var(--color-accent)' : '1px solid var(--color-border)',
                 backgroundColor: selectedMode === m ? 'var(--color-bg)' : 'transparent',
                 color: 'var(--color-text)',
                 fontWeight: selectedMode === m ? 700 : 500,
-                fontSize: '0.8rem',
+                fontSize: '0.825rem',
                 cursor: 'pointer',
                 minHeight: '44px',
                 textTransform: 'capitalize',
@@ -311,13 +347,14 @@ export const ExplorePage: React.FC = () => {
             setIsLoading(true);
             setFetchTrigger((t) => t + 1);
           }}
+          className="interactive-btn"
           style={{
-            padding: '4px 16px',
+            padding: '6px 18px',
             backgroundColor: 'var(--color-accent)',
             color: 'var(--color-accent-contrast)',
             border: 'none',
-            borderRadius: 'var(--radius-btn, 6px)',
-            fontWeight: 600,
+            borderRadius: 'var(--radius-btn, 8px)',
+            fontWeight: 700,
             fontSize: '0.85rem',
             cursor: 'pointer',
             minHeight: '44px',
@@ -331,6 +368,7 @@ export const ExplorePage: React.FC = () => {
           <button
             type="button"
             onClick={handleResetFilters}
+            className="interactive-btn"
             style={{
               background: 'none',
               border: 'none',
