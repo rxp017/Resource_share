@@ -61,7 +61,7 @@ export const AppLayout: React.FC = () => {
       {/* Glassmorphic Sticky Header */}
       <header
         role="banner"
-        className="glass-panel"
+        className="glass-panel header-mobile"
         style={{
           padding: '10px 20px',
           display: 'flex',
@@ -229,16 +229,17 @@ export const AppLayout: React.FC = () => {
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '8px',
-                padding: '8px 16px',
+                gap: '6px',
+                padding: '6px 12px',
                 borderRadius: 'var(--radius-btn, 8px)',
                 fontWeight: 600,
-                fontSize: '0.875rem',
+                fontSize: '0.825rem',
                 textDecoration: 'none',
-                minHeight: '40px',
+                minHeight: '36px',
+                flexShrink: 0,
               }}
             >
-              <GoogleIcon size={16} />
+              <GoogleIcon size={15} />
               <span>Sign In</span>
             </Link>
           )}

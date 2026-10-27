@@ -313,6 +313,7 @@ export const ExplorePage: React.FC = () => {
               onClick={() => setSelectedCategory(cat.id)}
               style={{
                 whiteSpace: 'nowrap',
+                flexShrink: 0,
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '7px',

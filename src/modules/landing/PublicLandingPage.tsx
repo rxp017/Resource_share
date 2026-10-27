@@ -207,12 +207,13 @@ export const PublicLandingPage: React.FC = () => {
 
         <h1
           style={{
-            fontSize: 'clamp(1.85rem, 5.5vw, 3.4rem)',
+            fontSize: 'clamp(1.5rem, 5vw, 3.4rem)',
             fontWeight: 800,
             marginBottom: '18px',
             letterSpacing: '-0.03em',
-            lineHeight: 1.15,
+            lineHeight: 1.18,
             color: 'var(--color-text)',
+            wordBreak: 'break-word',
           }}
         >
           Share, Borrow & Rent <br />
@@ -221,7 +222,7 @@ export const PublicLandingPage: React.FC = () => {
 
         <p
           style={{
-            fontSize: 'clamp(0.95rem, 2.5vw, 1.15rem)',
+            fontSize: 'clamp(0.925rem, 2.5vw, 1.15rem)',
             color: 'var(--color-text-muted)',
             maxWidth: '660px',
             margin: '0 auto 32px auto',
@@ -233,9 +234,11 @@ export const PublicLandingPage: React.FC = () => {
 
         {/* Primary CTA Buttons */}
         <div
+          className="flex-col-mobile"
           style={{
             display: 'flex',
             justifyContent: 'center',
+            alignItems: 'center',
             gap: '12px',
             flexWrap: 'wrap',
           }}
@@ -266,7 +269,7 @@ export const PublicLandingPage: React.FC = () => {
           {user && membership?.status === 'active' ? (
             <Link
               to="/listings/new"
-              className="interactive-btn btn-secondary"
+              className="interactive-btn btn-secondary full-width-mobile"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -287,7 +290,7 @@ export const PublicLandingPage: React.FC = () => {
           ) : (
             <Link
               to="/login"
-              className="interactive-btn"
+              className="interactive-btn full-width-mobile"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
