@@ -7,3 +7,4 @@ export * from './UnavailableState';
 export * from './ItemIllustration';
 export * from './NotFoundPage';
 export * from './ErrorBoundary';
+export * from './Icons';

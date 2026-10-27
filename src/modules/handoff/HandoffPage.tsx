@@ -6,6 +6,7 @@ import { supabase } from '../../shared/api-client/supabase';
 import { generateQrSvg } from '../../shared/utils/qrGenerator';
 import { createHandoffSession, redeemHandoffChallenge, finalizeHandoff } from './api';
 import type { TransactionItem } from '../exchanges/types';
+import { CheckCircleIcon, CopyIcon, CheckIcon } from '../../shared/components';
 
 export const HandoffPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -235,7 +236,21 @@ export const HandoffPage: React.FC = () => {
         {/* Finalized State */}
         {isFinalized ? (
           <div style={{ textAlign: 'center', padding: '32px 16px' }}>
-            <div style={{ fontSize: '3rem', marginBottom: '12px' }}>🎉</div>
+            <div
+              style={{
+                width: '64px',
+                height: '64px',
+                borderRadius: '50%',
+                backgroundColor: '#dcfce7',
+                color: '#16a34a',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 16px auto',
+              }}
+            >
+              <CheckCircleIcon size={36} color="#16a34a" />
+            </div>
             <h2 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#15803d', marginBottom: '8px' }}>
               Handover Successfully Finalized!
             </h2>
@@ -391,7 +406,15 @@ export const HandoffPage: React.FC = () => {
                           minWidth: 'auto',
                         }}
                       >
-                        {copiedCode ? '✓ Copied!' : '📋 Copy'}
+                        {copiedCode ? (
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                            <CheckIcon size={13} /> Copied!
+                          </span>
+                        ) : (
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                            <CopyIcon size={13} /> Copy
+                          </span>
+                        )}
                       </button>
                     </div>
                   </div>

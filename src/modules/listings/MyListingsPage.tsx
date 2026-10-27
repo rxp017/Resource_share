@@ -6,6 +6,7 @@ import type { ListingItem } from './types';
 import { Skeleton } from '../../shared/components/Skeleton';
 import { EmptyState } from '../../shared/components/EmptyState';
 import { ErrorState } from '../../shared/components/ErrorState';
+import { MapPinIcon } from '../../shared/components';
 
 export const MyListingsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -198,8 +199,9 @@ export const MyListingsPage: React.FC = () => {
                   {item.title}
                 </Link>
 
-                <p style={{ fontSize: '0.825rem', color: 'var(--color-text-muted)' }}>
-                  📍 {item.pickup_zone} &bull; Listed {new Date(item.created_at).toLocaleDateString()}
+                <p style={{ fontSize: '0.825rem', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <MapPinIcon size={12} style={{ color: 'var(--color-accent)', flexShrink: 0 }} />
+                  <span>{item.pickup_zone} &bull; Listed {new Date(item.created_at).toLocaleDateString()}</span>
                 </p>
               </div>
 

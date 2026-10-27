@@ -420,3 +420,20 @@ input:focus, textarea:focus, select:focus {
     font-size: 16px;
   }
 }
+
+/* 10. Responsive Visibility & Layout Utilities */
+@media (max-width: 640px) {
+  .hide-on-mobile {
+    display: none !important;
+  }
+  .full-width-mobile {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+@media (min-width: 641px) {
+  .show-on-mobile {
+    display: none !important;
+  }
+}

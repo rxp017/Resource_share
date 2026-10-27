@@ -16,6 +16,7 @@ import type { TransactionItem, PaymentProof } from './types';
 import { ChatThread } from '../chat/ChatThread';
 import { Skeleton } from '../../shared/components/Skeleton';
 import { ErrorState } from '../../shared/components/ErrorState';
+import { QrCodeIcon, PackageIcon, RefreshCwIcon, CheckCircleIcon, AlertCircleIcon } from '../../shared/components';
 
 export const ExchangeDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -629,8 +630,9 @@ export const ExchangeDetailPage: React.FC = () => {
 
           {transaction.mode === 'free_loan' ? (
             <div>
-              <h3 style={{ fontSize: '1.05rem', fontWeight: 800, marginBottom: '8px', color: '#166534' }}>
-                ✓ Free Loan Approved
+              <h3 style={{ fontSize: '1.05rem', fontWeight: 800, marginBottom: '8px', color: '#166534', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <CheckCircleIcon size={18} color="#166534" />
+                <span>Free Loan Approved</span>
               </h3>
               <p style={{ fontSize: '0.9rem', color: 'var(--color-text)', lineHeight: 1.5 }}>
                 No payment is required for this free loan. Meet at <strong>{transaction.pickup_zone}</strong> to pick up the item.
@@ -996,8 +998,9 @@ export const ExchangeDetailPage: React.FC = () => {
             marginBottom: '24px',
           }}
         >
-          <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#166534', margin: '0 0 8px 0' }}>
-            ✓ Ready for In-Person Pickup Handover
+          <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#166534', margin: '0 0 8px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <CheckCircleIcon size={18} color="#166534" />
+            <span>Ready for In-Person Pickup Handover</span>
           </h3>
           <p style={{ fontSize: '0.9rem', color: '#15803d', margin: '0 0 16px 0', lineHeight: 1.5 }}>
             Payment is acknowledged (or free loan active). Meet at <strong>{transaction.pickup_zone || 'HITAM Campus'}</strong> with student ID to complete physical handover.
@@ -1021,7 +1024,8 @@ export const ExchangeDetailPage: React.FC = () => {
                 boxShadow: '0 2px 6px rgba(22, 163, 74, 0.3)',
               }}
             >
-              📱 Launch In-Person QR Pickup Handoff →
+              <QrCodeIcon size={18} />
+              Launch In-Person QR Pickup Handoff →
             </Link>
           </div>
         </div>
@@ -1038,8 +1042,9 @@ export const ExchangeDetailPage: React.FC = () => {
             marginBottom: '24px',
           }}
         >
-          <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#1e40af', margin: '0 0 8px 0' }}>
-            📦 Item Currently in Borrower Custody
+          <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#1e40af', margin: '0 0 8px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <PackageIcon size={18} color="#1e40af" />
+            Item Currently in Borrower Custody
           </h3>
           <p style={{ fontSize: '0.9rem', color: '#1e3a8a', margin: '0 0 16px 0', lineHeight: 1.5 }}>
             The item was picked up successfully. Scheduled return date: <strong>{transaction.end_date || 'Agreed Date'}</strong>.
@@ -1064,7 +1069,8 @@ export const ExchangeDetailPage: React.FC = () => {
                 boxShadow: '0 2px 6px rgba(37, 99, 235, 0.3)',
               }}
             >
-              🔄 Start In-Person Return & Condition Check →
+              <RefreshCwIcon size={18} />
+              Start In-Person Return & Condition Check →
             </Link>
           </div>
         </div>
@@ -1081,8 +1087,9 @@ export const ExchangeDetailPage: React.FC = () => {
             marginBottom: '24px',
           }}
         >
-          <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#166534', margin: '0 0 8px 0' }}>
-            ✓ Exchange Completed
+          <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#166534', margin: '0 0 8px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <CheckCircleIcon size={18} color="#166534" />
+            <span>Exchange Completed</span>
           </h3>
           <p style={{ fontSize: '0.9rem', color: '#15803d', margin: '0 0 16px 0', lineHeight: 1.5 }}>
             Both students have verified physical handoff and completed this campus exchange.
@@ -1105,7 +1112,7 @@ export const ExchangeDetailPage: React.FC = () => {
                 textDecoration: 'none',
               }}
             >
-              ★ Rate & Review Counterparty
+              Rate & Review Counterparty
             </Link>
           </div>
         </div>
@@ -1122,8 +1129,9 @@ export const ExchangeDetailPage: React.FC = () => {
             marginBottom: '24px',
           }}
         >
-          <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#92400e', margin: '0 0 8px 0' }}>
-            ⚠️ Returned with Condition Dispute
+          <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#92400e', margin: '0 0 8px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <AlertCircleIcon size={18} color="#92400e" />
+            <span>Returned with Condition Dispute</span>
           </h3>
           <p style={{ fontSize: '0.9rem', color: '#78350f', margin: '0 0 12px 0', lineHeight: 1.5 }}>
             The item was physically returned to the owner, but participants recorded disagreement on its condition. A case has been submitted for campus moderator review.

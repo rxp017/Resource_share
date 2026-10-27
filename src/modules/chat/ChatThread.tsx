@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../auth';
 import { fetchMessages, sendMessage } from './api';
 import type { MessageItem } from './types';
+import { MessageSquareIcon, LockIcon, CopyIcon, CheckIcon } from '../../shared/components';
 
 interface ChatThreadProps {
   transactionId: string;
@@ -55,10 +56,10 @@ export const ChatThread: React.FC<ChatThreadProps> = ({
   const [sendError, setSendError] = useState<string | null>(null);
 
   const QUICK_PROMPTS = [
-    '📍 Central Library Gate 2',
-    '☕ Near Canteen',
-    '🏃 On my way (5 mins)',
-    '👋 Arrived at meetup spot',
+    'Central Library Gate 2',
+    'Near Canteen',
+    'On my way (5 mins)',
+    'Arrived at meetup spot',
   ];
 
   const handleCopyMessage = (id: string, text: string) => {
@@ -111,7 +112,7 @@ export const ChatThread: React.FC<ChatThreadProps> = ({
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontSize: '1.1rem' }}>💬</span>
+          <MessageSquareIcon size={16} color="var(--color-accent)" />
           <span style={{ fontSize: '0.875rem', fontWeight: 700 }}>
             In-App Exchange Chat with {counterpartName}
           </span>
@@ -125,9 +126,13 @@ export const ChatThread: React.FC<ChatThreadProps> = ({
             border: '1px solid var(--color-border)',
             color: 'var(--color-text-muted)',
             fontWeight: 600,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px',
           }}
         >
-          🔒 Encrypted · On-Campus Only
+          <LockIcon size={11} />
+          Encrypted · On-Campus Only
         </span>
       </div>
 
@@ -144,8 +149,10 @@ export const ChatThread: React.FC<ChatThreadProps> = ({
       >
         {messages.length === 0 ? (
           <div style={{ textAlign: 'center', margin: 'auto', color: 'var(--color-text-muted)', fontSize: '0.875rem', padding: '24px 0' }}>
-            <div style={{ fontSize: '1.8rem', marginBottom: '8px' }}>🤝</div>
-            <p style={{ margin: '0 0 6px 0', fontWeight: 600 }}>No messages yet</p>
+            <div style={{ width: '44px', height: '44px', borderRadius: '50%', backgroundColor: 'color-mix(in srgb, var(--color-accent) 12%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 10px auto' }}>
+              <MessageSquareIcon size={22} color="var(--color-accent)" />
+            </div>
+            <p style={{ margin: '0 0 6px 0', fontWeight: 600, color: 'var(--color-text)' }}>No messages yet</p>
             <p style={{ margin: 0, fontSize: '0.8rem' }}>Tap a quick coordination chip below or send a note to set a pickup time.</p>
           </div>
         ) : (
@@ -205,7 +212,15 @@ export const ChatThread: React.FC<ChatThreadProps> = ({
                       transition: 'opacity 0.15s',
                     }}
                   >
-                    {isCopied ? '✓ Copied' : '📋'}
+                    {isCopied ? (
+                      <span style={{ color: 'var(--color-success)', display: 'inline-flex', alignItems: 'center', gap: '2px' }}>
+                        <CheckIcon size={11} /> Copied
+                      </span>
+                    ) : (
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '2px' }}>
+                        <CopyIcon size={11} /> Copy
+                      </span>
+                    )}
                   </button>
                 </div>
               </div>

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from './useAuth';
 import { isSafeRedirect } from './redirect';
+import { LockIcon, AlertCircleIcon } from '../../shared/components';
 
 export const LoginPage: React.FC = () => {
   const { user, membership, isLoading, signInWithGoogle, signOut } = useAuth();
@@ -110,7 +111,8 @@ export const LoginPage: React.FC = () => {
             marginBottom: '16px',
           }}
         >
-          🔒 HITAM Campus Network · Verified Student Access
+          <LockIcon size={14} />
+          <span>HITAM Campus Network · Verified Student Access</span>
         </div>
         <h1 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '8px', color: 'var(--color-text)' }}>
           Resource Share
@@ -151,7 +153,7 @@ export const LoginPage: React.FC = () => {
             }}
           >
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-              <span style={{ fontSize: '1.25rem', lineHeight: 1 }} aria-hidden="true">🚫</span>
+              <AlertCircleIcon size={20} color="#ef4444" style={{ flexShrink: 0, marginTop: '2px' }} />
               <div>
                 <strong style={{ display: 'block', color: '#ef4444', marginBottom: '4px' }}>
                   College Domain Required

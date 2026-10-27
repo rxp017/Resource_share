@@ -119,7 +119,7 @@ export const ModerationQueuePage: React.FC = () => {
             cursor: 'pointer',
           }}
         >
-          📦 Listings Queue ({listings.length})
+          Listings Queue ({listings.length})
         </button>
         <button
           type="button"
@@ -135,7 +135,7 @@ export const ModerationQueuePage: React.FC = () => {
             cursor: 'pointer',
           }}
         >
-          ⚖️ Disputes & Cases ({disputes.length})
+          Disputes & Cases ({disputes.length})
         </button>
       </div>
 

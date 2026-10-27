@@ -5,6 +5,7 @@ import { useAuth } from '../auth';
 import { fetchConversations } from './api';
 import { ChatThread } from './ChatThread';
 import type { ConversationItem } from './types';
+import { MessageSquareIcon } from '../../shared/components';
 
 export const InboxPage: React.FC = () => {
   const { id } = useParams<{ id?: string }>();
@@ -56,7 +57,20 @@ export const InboxPage: React.FC = () => {
             borderRadius: '12px',
           }}
         >
-          <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>💬</div>
+          <div
+            style={{
+              width: '64px',
+              height: '64px',
+              borderRadius: '50%',
+              backgroundColor: 'color-mix(in srgb, var(--color-accent) 12%, transparent)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 16px auto',
+            }}
+          >
+            <MessageSquareIcon size={32} color="var(--color-accent)" />
+          </div>
           <h2 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '8px' }}>No Active Chats</h2>
           <p style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem', maxWidth: '420px', margin: '0 auto 20px auto' }}>
             When you request an item or receive an exchange request, your direct communication thread will appear here.
@@ -211,8 +225,21 @@ export const InboxPage: React.FC = () => {
               </div>
             ) : (
               <div style={{ margin: 'auto', textAlign: 'center', color: 'var(--color-text-muted)', padding: '40px' }}>
-                <div style={{ fontSize: '2rem', marginBottom: '8px' }}>👈</div>
-                <p>Select a conversation on the left to start coordinating.</p>
+                <div
+                  style={{
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '50%',
+                    backgroundColor: 'var(--color-bg)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto 12px auto',
+                  }}
+                >
+                  <MessageSquareIcon size={22} color="var(--color-text-muted)" />
+                </div>
+                <p style={{ fontWeight: 600 }}>Select a conversation on the left to start coordinating.</p>
               </div>
             )}
           </div>

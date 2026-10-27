@@ -7,6 +7,7 @@ import { useAuth } from '../auth/useAuth';
 import { Skeleton } from '../../shared/components/Skeleton';
 import { ErrorState } from '../../shared/components/ErrorState';
 import { ItemIllustration } from '../../shared/components/ItemIllustration';
+import { PenToolIcon } from '../../shared/components/Icons';
 
 export const ListingDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -361,7 +362,8 @@ export const ListingDetailPage: React.FC = () => {
                     boxShadow: '0 4px 14px rgba(13, 148, 136, 0.25)',
                   }}
                 >
-                  ✏️ Edit Listing
+                  <PenToolIcon size={16} strokeWidth={2} />
+                  <span>Edit Listing</span>
                 </Link>
                 <Link
                   to="/my/listings"

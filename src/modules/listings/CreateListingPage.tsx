@@ -4,6 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth';
 import { createListing, CAMPUS_PICKUP_ZONES } from './api';
 import type { ListingCategory, ListingCondition, ListingMode } from './types';
+import { PlusCircleIcon } from '../../shared/components';
 
 const CATEGORIES: { id: ListingCategory; label: string }[] = [
   { id: 'textbooks', label: 'Textbooks & Academic Notes' },
@@ -417,7 +418,7 @@ export const CreateListingPage: React.FC = () => {
           >
             {CAMPUS_PICKUP_ZONES.map((zone) => (
               <option key={zone} value={zone}>
-                📍 {zone}
+                {zone}
               </option>
             ))}
           </select>
@@ -512,7 +513,7 @@ export const CreateListingPage: React.FC = () => {
                   padding: '4px',
                 }}
               >
-                <span style={{ fontSize: '1.5rem', marginBottom: '2px' }}>📷</span>
+                <PlusCircleIcon size={22} color="var(--color-text-muted)" style={{ marginBottom: '4px' }} />
                 <span>Add Photo</span>
                 <input
                   type="file"

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import type { ListingItem } from './types';
-import { ItemIllustration } from '../../shared/components';
+import { ItemIllustration, MapPinIcon } from '../../shared/components';
 
 interface ListingCardProps {
   listing: ListingItem;
@@ -169,7 +169,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
             fontWeight: 500,
           }}
         >
-          <span>📍</span>
+          <MapPinIcon size={14} style={{ color: 'var(--color-accent)', flexShrink: 0 }} />
           <span>{listing.pickup_zone || 'HITAM Campus Pickup'}</span>
         </p>
 

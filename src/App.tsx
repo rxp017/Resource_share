@@ -59,60 +59,60 @@ export const App: React.FC = () => {
               <Route path="/" element={<PublicLandingPage />} />
               <Route path="/login" element={<LoginPage />} />
 
-              {/* Authenticated user routes (Pending or Active) */}
-              <Route element={<RequireAuth />}>
-                <Route path="/verify" element={<VerifyPendingPage />} />
+                {/* Public Marketplace Catalog under AppLayout */}
+                <Route element={<AppLayout />}>
+                  <Route path="/explore" element={<ExplorePage />} />
+                  <Route path="/listings/:id" element={<ListingDetailPage />} />
+                  <Route
+                    path="/help"
+                    element={
+                      <div style={{ padding: '32px 16px', maxWidth: '680px', margin: '0 auto' }}>
+                        <h2 style={{ fontSize: '1.4rem', fontWeight: 800, marginBottom: '8px' }}>HITAM Campus Help & Guidelines</h2>
+                        <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', lineHeight: 1.5 }}>
+                          HITAM Resource Share operates strictly peer-to-peer for verified @hitam.org students.
+                          Always meet at designated campus pickup zones (Library Entrance, Canteen Plaza, Main Gate).
+                          Never exchange prohibited items or transfer off-campus funds without verifying receipt in your own UPI app.
+                        </p>
+                      </div>
+                    }
+                  />
 
-                {/* Active Campus Members Only */}
-                <Route element={<RequireActiveMembership />}>
-                  {/* Onboarding Guard: routes un-onboarded members to /onboarding */}
-                  <Route element={<OnboardingGuard />}>
-                    <Route element={<AppLayout />}>
-                      <Route path="/onboarding" element={<OnboardingPage />} />
-                      <Route path="/settings" element={<SettingsPage />} />
+                  {/* Authenticated user routes (Pending or Active) */}
+                  <Route element={<RequireAuth />}>
+                    <Route path="/verify" element={<VerifyPendingPage />} />
 
-                      {/* Explore & Listings Feed */}
-                      <Route path="/explore" element={<ExplorePage />} />
-                      <Route path="/listings/new" element={<CreateListingPage />} />
-                      <Route path="/listings/:id" element={<ListingDetailPage />} />
-                      <Route path="/listings/:id/edit" element={<EditListingPage />} />
-                      <Route path="/listings/:id/request" element={<RequestExchangePage />} />
-                      <Route path="/my/listings" element={<MyListingsPage />} />
-                      <Route path="/exchanges" element={<ExchangesListPage />} />
-                      <Route path="/exchanges/:id" element={<ExchangeDetailPage />} />
-                      <Route path="/exchanges/:id/handoff" element={<HandoffPage />} />
+                    {/* Active Campus Members Only */}
+                    <Route element={<RequireActiveMembership />}>
+                      <Route element={<OnboardingGuard />}>
+                        <Route path="/onboarding" element={<OnboardingPage />} />
+                        <Route path="/settings" element={<SettingsPage />} />
 
-                      {/* Messaging, Notifications & Reviews */}
-                      <Route path="/inbox" element={<InboxPage />} />
-                      <Route path="/inbox/:id" element={<InboxPage />} />
-                      <Route path="/notifications" element={<NotificationsPage />} />
-                      <Route path="/feedback" element={<FeedbackPage />} />
-                      <Route path="/profile" element={<TrustProfilePage />} />
-                      <Route path="/profile/:userId" element={<TrustProfilePage />} />
+                        {/* Protected Listing Actions */}
+                        <Route path="/listings/new" element={<CreateListingPage />} />
+                        <Route path="/listings/:id/edit" element={<EditListingPage />} />
+                        <Route path="/listings/:id/request" element={<RequestExchangePage />} />
+                        <Route path="/my/listings" element={<MyListingsPage />} />
+                        <Route path="/exchanges" element={<ExchangesListPage />} />
+                        <Route path="/exchanges/:id" element={<ExchangeDetailPage />} />
+                        <Route path="/exchanges/:id/handoff" element={<HandoffPage />} />
 
-                      <Route
-                        path="/help"
-                        element={
-                          <div style={{ padding: '32px 16px', maxWidth: '680px', margin: '0 auto' }}>
-                            <h2 style={{ fontSize: '1.4rem', fontWeight: 800, marginBottom: '8px' }}>HITAM Campus Help & Guidelines</h2>
-                            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', lineHeight: 1.5 }}>
-                              HITAM Resource Share operates strictly peer-to-peer for verified @hitam.org students.
-                              Always meet at designated campus pickup zones (Library Entrance, Canteen Plaza, Main Gate).
-                              Never exchange prohibited items or transfer off-campus funds without verifying receipt in your own UPI app.
-                            </p>
-                          </div>
-                        }
-                      />
+                        {/* Messaging, Notifications & Reviews */}
+                        <Route path="/inbox" element={<InboxPage />} />
+                        <Route path="/inbox/:id" element={<InboxPage />} />
+                        <Route path="/notifications" element={<NotificationsPage />} />
+                        <Route path="/feedback" element={<FeedbackPage />} />
+                        <Route path="/profile" element={<TrustProfilePage />} />
+                        <Route path="/profile/:userId" element={<TrustProfilePage />} />
 
-                      {/* Operator / Moderator Queue */}
-                      <Route element={<RequireModerator />}>
-                        <Route path="/admin/moderation" element={<ModerationQueuePage />} />
-                        <Route path="/admin/members" element={<MembersManagementPage />} />
+                        {/* Operator / Moderator Queue */}
+                        <Route element={<RequireModerator />}>
+                          <Route path="/admin/moderation" element={<ModerationQueuePage />} />
+                          <Route path="/admin/members" element={<MembersManagementPage />} />
+                        </Route>
                       </Route>
                     </Route>
                   </Route>
                 </Route>
-              </Route>
 
               {/* 404 catch-all */}
               <Route path="*" element={<NotFoundPage />} />

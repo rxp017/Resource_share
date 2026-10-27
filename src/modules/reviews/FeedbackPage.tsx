@@ -5,6 +5,7 @@ import { supabase } from '../../shared/api-client/supabase';
 import { submitReview, fetchReviewsForUser } from './api';
 import type { ReviewItem } from './types';
 import type { TransactionItem } from '../exchanges/types';
+import { XIcon } from '../../shared/components';
 
 export const FeedbackPage: React.FC = () => {
   const { user } = useAuth();
@@ -120,10 +121,10 @@ export const FeedbackPage: React.FC = () => {
             <button
               onClick={() => setSelectedTxId(null)}
               className="interactive-btn"
-              style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: 'var(--color-text-muted)' }}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-muted)' }}
               aria-label="Close review form"
             >
-              ✕
+              <XIcon size={18} />
             </button>
           </div>
 
@@ -288,7 +289,7 @@ export const FeedbackPage: React.FC = () => {
                     cursor: 'pointer',
                   }}
                 >
-                  ★ Rate Counterparty
+                  Rate Counterparty
                 </button>
               </div>
             ))}

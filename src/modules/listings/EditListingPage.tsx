@@ -6,6 +6,7 @@ import { fetchListingById, updateListing, CAMPUS_PICKUP_ZONES } from './api';
 import type { ListingCategory, ListingCondition, ListingMode, ListingItem } from './types';
 import { Skeleton } from '../../shared/components/Skeleton';
 import { ErrorState } from '../../shared/components/ErrorState';
+import { PlusCircleIcon } from '../../shared/components';
 
 const CATEGORIES: { id: ListingCategory; label: string }[] = [
   { id: 'textbooks', label: 'Textbooks & Academic Notes' },
@@ -536,7 +537,7 @@ export const EditListingPage: React.FC = () => {
                   fontSize: '0.75rem',
                 }}
               >
-                <span style={{ fontSize: '1.25rem' }}>📷</span>
+                <PlusCircleIcon size={22} color="var(--color-text-muted)" style={{ marginBottom: '2px' }} />
                 <span>Add Photo</span>
                 <input
                   type="file"

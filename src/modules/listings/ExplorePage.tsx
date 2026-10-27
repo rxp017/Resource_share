@@ -1,3 +1,4 @@
+// src/modules/listings/ExplorePage.tsx
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { fetchPublishedListings } from './api';
@@ -6,17 +7,37 @@ import { ListingCard } from './ListingCard';
 import { Skeleton } from '../../shared/components/Skeleton';
 import { EmptyState } from '../../shared/components/EmptyState';
 import { ErrorState } from '../../shared/components/ErrorState';
+import {
+  SearchIcon,
+  XIcon,
+  FilterIcon,
+  PlusCircleIcon,
+  BookOpenIcon,
+  LaptopIcon,
+  FlaskConicalIcon,
+  PenToolIcon,
+  TrophyIcon,
+  MusicIcon,
+  ShirtIcon,
+  PackageIcon,
+} from '../../shared/components/Icons';
 
-const CATEGORIES: { id: string; label: string }[] = [
-  { id: 'all', label: 'All Items' },
-  { id: 'textbooks', label: '📚 Textbooks' },
-  { id: 'electronics', label: '💻 Electronics' },
-  { id: 'lab_gear', label: '🔬 Lab Gear' },
-  { id: 'stationery', label: '✏️ Stationery' },
-  { id: 'sports', label: '⚽ Sports' },
-  { id: 'musical', label: '🎸 Musical' },
-  { id: 'uniforms', label: '👔 Uniforms' },
-  { id: 'other', label: '📦 Other' },
+interface CategoryConfig {
+  id: string;
+  label: string;
+  icon: React.ReactNode;
+}
+
+const CATEGORIES: CategoryConfig[] = [
+  { id: 'all', label: 'All Items', icon: <PackageIcon size={16} strokeWidth={2} /> },
+  { id: 'textbooks', label: 'Textbooks', icon: <BookOpenIcon size={16} strokeWidth={2} /> },
+  { id: 'electronics', label: 'Electronics', icon: <LaptopIcon size={16} strokeWidth={2} /> },
+  { id: 'lab_gear', label: 'Lab Gear', icon: <FlaskConicalIcon size={16} strokeWidth={2} /> },
+  { id: 'stationery', label: 'Stationery', icon: <PenToolIcon size={16} strokeWidth={2} /> },
+  { id: 'sports', label: 'Sports', icon: <TrophyIcon size={16} strokeWidth={2} /> },
+  { id: 'musical', label: 'Musical', icon: <MusicIcon size={16} strokeWidth={2} /> },
+  { id: 'uniforms', label: 'Uniforms', icon: <ShirtIcon size={16} strokeWidth={2} /> },
+  { id: 'other', label: 'Other', icon: <PackageIcon size={16} strokeWidth={2} /> },
 ];
 
 export const ExplorePage: React.FC = () => {
@@ -33,6 +54,7 @@ export const ExplorePage: React.FC = () => {
   const [maxSalePriceRupees, setMaxSalePriceRupees] = useState<string>('');
   const [maxRentalDailyRupees, setMaxRentalDailyRupees] = useState<string>('');
   const [fetchTrigger, setFetchTrigger] = useState<number>(0);
+  const [showFilters, setShowFilters] = useState<boolean>(false);
 
   // 300ms debounce on search input to prevent query flooding
   useEffect(() => {
@@ -89,7 +111,7 @@ export const ExplorePage: React.FC = () => {
       }
     }
 
-    load();
+    void load();
     return () => {
       isCancelled = true;
     };
@@ -112,8 +134,14 @@ export const ExplorePage: React.FC = () => {
     setIsLoading(true);
   };
 
+  const activeFilterCount =
+    (selectedCategory !== 'all' ? 1 : 0) +
+    (selectedMode !== 'all' ? 1 : 0) +
+    (maxSalePriceRupees ? 1 : 0) +
+    (maxRentalDailyRupees ? 1 : 0);
+
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '24px 20px 80px' }}>
+    <div style={{ maxWidth: '1240px', margin: '0 auto', padding: '24px 16px 80px' }}>
       {/* Top Banner / Hero */}
       <div
         style={{
@@ -126,41 +154,50 @@ export const ExplorePage: React.FC = () => {
         }}
       >
         <div>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, marginBottom: '4px' }}>
+          <h1 style={{ fontSize: 'clamp(1.5rem, 4vw, 1.85rem)', fontWeight: 800, marginBottom: '4px', letterSpacing: '-0.02em' }}>
             HITAM Campus Marketplace
           </h1>
-          <p style={{ color: 'var(--color-text-muted)', fontSize: '0.95rem' }}>
+          <p style={{ color: 'var(--color-text-muted)', fontSize: '0.925rem' }}>
             Verified student peer sharing: buy, borrow, or rent physical academic resources.
           </p>
         </div>
 
         <Link
           to="/listings/new"
-          className="interactive-btn"
+          className="interactive-btn btn-primary"
           style={{
             display: 'inline-flex',
             alignItems: 'center',
             gap: '8px',
-            backgroundColor: 'var(--color-accent)',
-            color: 'var(--color-accent-contrast)',
             textDecoration: 'none',
             padding: '10px 20px',
             borderRadius: 'var(--radius-btn, 8px)',
             fontWeight: 700,
-            fontSize: '0.95rem',
+            fontSize: '0.925rem',
             minHeight: '44px',
-            boxShadow: '0 4px 14px rgba(13, 148, 136, 0.25)',
           }}
         >
-          <span>➕</span>
-          <span>List an item</span>
+          <PlusCircleIcon size={18} strokeWidth={2.2} />
+          <span>Post an item</span>
         </Link>
       </div>
 
-      {/* Search Bar */}
-      <form onSubmit={handleSearchSubmit} style={{ marginBottom: '20px' }}>
-        <div style={{ display: 'flex', gap: '8px', position: 'relative' }}>
-          <div style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center' }}>
+      {/* Search Bar & Filter Toggle Toolbar */}
+      <div style={{ marginBottom: '16px', display: 'flex', gap: '10px', alignItems: 'center' }}>
+        <form onSubmit={handleSearchSubmit} style={{ flex: 1 }}>
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+            <span
+              style={{
+                position: 'absolute',
+                left: '14px',
+                color: 'var(--color-text-muted)',
+                display: 'flex',
+                alignItems: 'center',
+                pointerEvents: 'none',
+              }}
+            >
+              <SearchIcon size={18} strokeWidth={2} />
+            </span>
             <input
               type="search"
               placeholder="Search textbooks, calculators, lab coats, drafters..."
@@ -168,14 +205,15 @@ export const ExplorePage: React.FC = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{
                 width: '100%',
-                minHeight: '44px',
-                padding: '8px 40px 8px 16px',
-                borderRadius: 'var(--radius-btn, 8px)',
+                minHeight: '46px',
+                padding: '8px 40px 8px 42px',
+                borderRadius: 'var(--radius-btn, 10px)',
                 border: '1px solid var(--color-border)',
                 backgroundColor: 'var(--color-surface)',
                 color: 'var(--color-text)',
-                fontSize: '1rem',
+                fontSize: '0.95rem',
                 outline: 'none',
+                boxShadow: 'var(--shadow-sm)',
               }}
             />
             {searchQuery && (
@@ -196,37 +234,64 @@ export const ExplorePage: React.FC = () => {
                   border: 'none',
                   cursor: 'pointer',
                   color: 'var(--color-text-muted)',
-                  fontSize: '1rem',
                   padding: '4px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
               >
-                ✕
+                <XIcon size={18} strokeWidth={2} />
               </button>
             )}
           </div>
-          <button
-            type="submit"
-            className="interactive-btn"
-            style={{
-              padding: '8px 24px',
-              backgroundColor: 'var(--color-accent)',
-              color: 'var(--color-accent-contrast)',
-              border: 'none',
-              borderRadius: 'var(--radius-btn, 8px)',
-              fontWeight: 700,
-              cursor: 'pointer',
-              minHeight: '44px',
-            }}
-          >
-            Search
-          </button>
-        </div>
-      </form>
+        </form>
 
-      {/* Category Pills (Horizontal Scroll) */}
+        {/* Filter Toggle Button */}
+        <button
+          type="button"
+          onClick={() => setShowFilters((prev) => !prev)}
+          className="interactive-btn"
+          aria-expanded={showFilters}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            minHeight: '46px',
+            padding: '8px 16px',
+            borderRadius: 'var(--radius-btn, 10px)',
+            border: activeFilterCount > 0 ? '1px solid var(--color-accent)' : '1px solid var(--color-border)',
+            backgroundColor: activeFilterCount > 0 ? 'color-mix(in srgb, var(--color-accent) 12%, var(--color-surface))' : 'var(--color-surface)',
+            color: activeFilterCount > 0 ? 'var(--color-accent)' : 'var(--color-text)',
+            fontWeight: 600,
+            fontSize: '0.875rem',
+            cursor: 'pointer',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          <FilterIcon size={16} strokeWidth={2} />
+          <span>Filters</span>
+          {activeFilterCount > 0 && (
+            <span
+              style={{
+                width: '20px',
+                height: '20px',
+                borderRadius: '50%',
+                backgroundColor: 'var(--color-accent)',
+                color: 'var(--color-accent-contrast)',
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              {activeFilterCount}
+            </span>
+          )}
+        </button>
+      </div>
+
+      {/* Category Pills (Horizontal Scroll with Touch Optimization) */}
       <div
         style={{
           display: 'flex',
@@ -234,172 +299,164 @@ export const ExplorePage: React.FC = () => {
           overflowX: 'auto',
           paddingBottom: '12px',
           marginBottom: '20px',
-          scrollbarWidth: 'thin',
+          scrollbarWidth: 'none',
+          WebkitOverflowScrolling: 'touch',
         }}
       >
-        {CATEGORIES.map((cat) => (
-          <button
-            key={cat.id}
-            type="button"
-            className="interactive-btn"
-            onClick={() => setSelectedCategory(cat.id)}
-            style={{
-              whiteSpace: 'nowrap',
-              padding: '6px 16px',
-              borderRadius: '999px',
-              border: '1px solid var(--color-border)',
-              backgroundColor:
-                selectedCategory === cat.id ? 'var(--color-accent)' : 'var(--color-surface)',
-              color:
-                selectedCategory === cat.id ? 'var(--color-accent-contrast)' : 'var(--color-text)',
-              fontWeight: selectedCategory === cat.id ? 700 : 500,
-              fontSize: '0.85rem',
-              cursor: 'pointer',
-              minHeight: '44px',
-              boxShadow: selectedCategory === cat.id ? '0 2px 8px rgba(13, 148, 136, 0.25)' : 'none',
-            }}
-          >
-            {cat.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Advanced Mode & Price Filters */}
-      <div
-        style={{
-          backgroundColor: 'var(--color-surface)',
-          border: '1px solid var(--color-border)',
-          borderRadius: 'var(--radius-card, 12px)',
-          padding: '16px 20px',
-          marginBottom: '28px',
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: '20px',
-          alignItems: 'center',
-          boxShadow: '0 2px 10px rgba(0,0,0,0.02)',
-        }}
-      >
-        {/* Mode Selector */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontSize: '0.85rem', fontWeight: 700 }}>Type:</span>
-          {(['all', 'sale', 'rental', 'free_loan'] as const).map((m) => (
+        {CATEGORIES.map((cat) => {
+          const isSelected = selectedCategory === cat.id;
+          return (
             <button
-              key={m}
+              key={cat.id}
               type="button"
               className="interactive-btn"
-              onClick={() => setSelectedMode(m)}
+              onClick={() => setSelectedCategory(cat.id)}
               style={{
-                padding: '6px 14px',
-                borderRadius: 'var(--radius-btn, 8px)',
-                border: selectedMode === m ? '2px solid var(--color-accent)' : '1px solid var(--color-border)',
-                backgroundColor: selectedMode === m ? 'var(--color-bg)' : 'transparent',
-                color: 'var(--color-text)',
-                fontWeight: selectedMode === m ? 700 : 500,
-                fontSize: '0.825rem',
+                whiteSpace: 'nowrap',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '7px',
+                padding: '8px 16px',
+                borderRadius: '999px',
+                border: isSelected ? '1px solid var(--color-accent)' : '1px solid var(--color-border)',
+                backgroundColor: isSelected ? 'var(--color-accent)' : 'var(--color-surface)',
+                color: isSelected ? 'var(--color-accent-contrast)' : 'var(--color-text)',
+                fontWeight: isSelected ? 700 : 500,
+                fontSize: '0.85rem',
                 cursor: 'pointer',
-                minHeight: '44px',
-                textTransform: 'capitalize',
+                minHeight: '40px',
+                boxShadow: isSelected ? '0 2px 8px rgba(13, 148, 136, 0.25)' : 'none',
+                transition: 'all 150ms ease',
               }}
             >
-              {m === 'free_loan' ? 'Free Loan' : m}
+              <span style={{ display: 'flex', alignItems: 'center' }}>{cat.icon}</span>
+              <span>{cat.label}</span>
             </button>
-          ))}
-        </div>
+          );
+        })}
+      </div>
 
-        {/* Separate Sale Price Filter */}
-        {(selectedMode === 'all' || selectedMode === 'sale') && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <label htmlFor="max-sale-price" style={{ fontSize: '0.85rem', fontWeight: 600 }}>
-              Max Sale (₹):
-            </label>
-            <input
-              id="max-sale-price"
-              type="number"
-              min="0"
-              placeholder="e.g. 1000"
-              value={maxSalePriceRupees}
-              onChange={(e) => setMaxSalePriceRupees(e.target.value)}
-              style={{
-                width: '110px',
-                minHeight: '44px',
-                padding: '4px 8px',
-                borderRadius: '4px',
-                border: '1px solid var(--color-border)',
-                backgroundColor: 'var(--color-surface)',
-                color: 'var(--color-text)',
-              }}
-            />
-          </div>
-        )}
-
-        {/* Separate Rental Daily Filter */}
-        {(selectedMode === 'all' || selectedMode === 'rental') && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <label htmlFor="max-rental-rate" style={{ fontSize: '0.85rem', fontWeight: 600 }}>
-              Max Rent/day (₹):
-            </label>
-            <input
-              id="max-rental-rate"
-              type="number"
-              min="0"
-              placeholder="e.g. 50"
-              value={maxRentalDailyRupees}
-              onChange={(e) => setMaxRentalDailyRupees(e.target.value)}
-              style={{
-                width: '110px',
-                minHeight: '44px',
-                padding: '4px 8px',
-                borderRadius: '4px',
-                border: '1px solid var(--color-border)',
-                backgroundColor: 'var(--color-surface)',
-                color: 'var(--color-text)',
-              }}
-            />
-          </div>
-        )}
-
-        <button
-          type="button"
-          onClick={() => {
-            setIsLoading(true);
-            setFetchTrigger((t) => t + 1);
-          }}
-          className="interactive-btn"
+      {/* Collapsible Mode & Price Filters Panel */}
+      {showFilters && (
+        <div
+          className="glass-panel animate-fade-in"
           style={{
-            padding: '6px 18px',
-            backgroundColor: 'var(--color-accent)',
-            color: 'var(--color-accent-contrast)',
-            border: 'none',
-            borderRadius: 'var(--radius-btn, 8px)',
-            fontWeight: 700,
-            fontSize: '0.85rem',
-            cursor: 'pointer',
-            minHeight: '44px',
-            marginLeft: 'auto',
+            borderRadius: 'var(--radius-card, 12px)',
+            padding: '16px 20px',
+            marginBottom: '24px',
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '18px',
+            alignItems: 'center',
+            boxShadow: 'var(--shadow-sm)',
           }}
         >
-          Apply Filters
-        </button>
+          {/* Mode Selector */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-text)' }}>Mode:</span>
+            {(['all', 'sale', 'rental', 'free_loan'] as const).map((m) => {
+              const isSelected = selectedMode === m;
+              return (
+                <button
+                  key={m}
+                  type="button"
+                  className="interactive-btn"
+                  onClick={() => setSelectedMode(m)}
+                  style={{
+                    padding: '6px 14px',
+                    borderRadius: 'var(--radius-btn, 8px)',
+                    border: isSelected ? '1px solid var(--color-accent)' : '1px solid var(--color-border)',
+                    backgroundColor: isSelected ? 'color-mix(in srgb, var(--color-accent) 15%, var(--color-surface))' : 'var(--color-surface)',
+                    color: isSelected ? 'var(--color-accent)' : 'var(--color-text)',
+                    fontWeight: isSelected ? 700 : 500,
+                    fontSize: '0.825rem',
+                    cursor: 'pointer',
+                    minHeight: '38px',
+                    textTransform: 'capitalize',
+                  }}
+                >
+                  {m === 'free_loan' ? 'Free Loan' : m}
+                </button>
+              );
+            })}
+          </div>
 
-        {(searchQuery || selectedCategory !== 'all' || selectedMode !== 'all' || maxSalePriceRupees || maxRentalDailyRupees) && (
-          <button
-            type="button"
-            onClick={handleResetFilters}
-            className="interactive-btn"
-            style={{
-              background: 'none',
-              border: 'none',
-              color: 'var(--color-text-muted)',
-              fontSize: '0.85rem',
-              cursor: 'pointer',
-              textDecoration: 'underline',
-              minHeight: '44px',
-            }}
-          >
-            Clear all
-          </button>
-        )}
-      </div>
+          {/* Sale Price Filter */}
+          {(selectedMode === 'all' || selectedMode === 'sale') && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <label htmlFor="max-sale-price" style={{ fontSize: '0.85rem', fontWeight: 600 }}>
+                Max Sale (₹):
+              </label>
+              <input
+                id="max-sale-price"
+                type="number"
+                min="0"
+                placeholder="e.g. 500"
+                value={maxSalePriceRupees}
+                onChange={(e) => setMaxSalePriceRupees(e.target.value)}
+                style={{
+                  width: '100px',
+                  minHeight: '38px',
+                  padding: '6px 10px',
+                  borderRadius: 'var(--radius-btn, 8px)',
+                  border: '1px solid var(--color-border)',
+                  backgroundColor: 'var(--color-surface)',
+                  color: 'var(--color-text)',
+                  fontSize: '0.875rem',
+                }}
+              />
+            </div>
+          )}
+
+          {/* Rental Daily Filter */}
+          {(selectedMode === 'all' || selectedMode === 'rental') && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <label htmlFor="max-rental-price" style={{ fontSize: '0.85rem', fontWeight: 600 }}>
+                Max Daily (₹):
+              </label>
+              <input
+                id="max-rental-price"
+                type="number"
+                min="0"
+                placeholder="e.g. 50"
+                value={maxRentalDailyRupees}
+                onChange={(e) => setMaxRentalDailyRupees(e.target.value)}
+                style={{
+                  width: '90px',
+                  minHeight: '38px',
+                  padding: '6px 10px',
+                  borderRadius: 'var(--radius-btn, 8px)',
+                  border: '1px solid var(--color-border)',
+                  backgroundColor: 'var(--color-surface)',
+                  color: 'var(--color-text)',
+                  fontSize: '0.875rem',
+                }}
+              />
+            </div>
+          )}
+
+          {activeFilterCount > 0 && (
+            <button
+              type="button"
+              onClick={handleResetFilters}
+              className="interactive-btn"
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--color-accent)',
+                fontSize: '0.85rem',
+                cursor: 'pointer',
+                fontWeight: 600,
+                textDecoration: 'underline',
+                minHeight: '38px',
+                marginLeft: 'auto',
+              }}
+            >
+              Reset all filters
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Main Grid / States */}
       {isLoading ? (
@@ -415,12 +472,12 @@ export const ExplorePage: React.FC = () => {
               key={idx}
               style={{
                 border: '1px solid var(--color-border)',
-                borderRadius: 'var(--radius-card, 8px)',
+                borderRadius: 'var(--radius-card, 12px)',
                 padding: '16px',
                 backgroundColor: 'var(--color-surface)',
               }}
             >
-              <Skeleton height="180px" borderRadius="6px" />
+              <Skeleton height="180px" borderRadius="8px" />
               <div style={{ marginTop: '12px' }}>
                 <Skeleton width="40%" height="16px" borderRadius="4px" />
               </div>

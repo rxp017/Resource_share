@@ -1,5 +1,5 @@
-// src/shared/components/ErrorBoundary.tsx
 import React, { Component, type ReactNode } from 'react';
+import { AlertCircleIcon } from './Icons';
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -49,8 +49,20 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
               border: '1px solid var(--color-danger, #B91C1C)',
             }}
           >
-            <div style={{ fontSize: '3rem', marginBottom: '16px' }} aria-hidden="true">
-              ⚠️
+            <div
+              style={{
+                width: '64px',
+                height: '64px',
+                borderRadius: '50%',
+                backgroundColor: 'color-mix(in srgb, var(--color-danger, #B91C1C) 12%, transparent)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 16px auto',
+              }}
+              aria-hidden="true"
+            >
+              <AlertCircleIcon size={32} color="var(--color-danger, #B91C1C)" />
             </div>
             <h1
               style={{

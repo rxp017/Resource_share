@@ -4,6 +4,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../auth';
 import { fetchTrustProfile, fetchReviewsForUser } from './api';
 import type { TrustProfile, ReviewItem } from './types';
+import { ShieldCheckIcon } from '../../shared/components';
 
 export const TrustProfilePage: React.FC = () => {
   const { userId } = useParams<{ userId?: string }>();
@@ -208,7 +209,7 @@ export const TrustProfilePage: React.FC = () => {
               gap: '10px',
             }}
           >
-            <span style={{ fontSize: '1.25rem' }}>🌱</span>
+            <ShieldCheckIcon size={20} color="var(--color-accent)" style={{ flexShrink: 0 }} />
             <span>
               <strong>Campus Newcomer:</strong> This student is establishing their exchange history. Welcome them and exchange in person at designated campus pickup zones!
             </span>

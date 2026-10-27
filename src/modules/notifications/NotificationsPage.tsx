@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchNotifications, markNotificationRead, markAllNotificationsRead } from './api';
 import type { NotificationItem } from './types';
+import { BellIcon, ClockIcon } from '../../shared/components';
 
 export const NotificationsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -139,7 +140,20 @@ export const NotificationsPage: React.FC = () => {
             borderRadius: '12px',
           }}
         >
-          <div style={{ fontSize: '2.5rem', marginBottom: '10px' }}>🔔</div>
+          <div
+            style={{
+              width: '64px',
+              height: '64px',
+              borderRadius: '50%',
+              backgroundColor: 'color-mix(in srgb, var(--color-accent) 12%, transparent)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 16px auto',
+            }}
+          >
+            <BellIcon size={32} color="var(--color-accent)" />
+          </div>
           <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '6px' }}>
             No Notifications
           </h3>
@@ -184,8 +198,8 @@ export const NotificationsPage: React.FC = () => {
               <div style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginBottom: '8px', lineHeight: 1.45 }}>
                 {n.body}
               </div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <span>🕒</span>
+              <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <ClockIcon size={12} color="var(--color-text-muted)" />
                 <span>{new Date(n.created_at).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}</span>
               </div>
             </div>

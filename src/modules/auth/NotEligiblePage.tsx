@@ -1,6 +1,7 @@
 // src/modules/auth/NotEligiblePage.tsx
 import React from 'react';
 import { useAuth } from './useAuth';
+import { AlertCircleIcon } from '../../shared/components';
 
 export const NotEligiblePage: React.FC = () => {
   const { user, signOut } = useAuth();
@@ -24,9 +25,8 @@ export const NotEligiblePage: React.FC = () => {
           alignItems: 'center',
           justifyContent: 'center',
           margin: '0 auto 20px auto',
-          fontSize: '24px'
         }}>
-          🚫
+          <AlertCircleIcon size={28} color="#dc2626" />
         </div>
 
         <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#991b1b', marginBottom: '12px' }}>

@@ -1,6 +1,7 @@
 // src/shared/components/NotFoundPage.tsx
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { AlertCircleIcon } from './Icons';
 
 export const NotFoundPage: React.FC = () => {
   return (
@@ -22,8 +23,20 @@ export const NotFoundPage: React.FC = () => {
           border: '1px solid var(--color-border)',
         }}
       >
-        <div style={{ fontSize: '3rem', marginBottom: '16px' }} aria-hidden="true">
-          🧭
+        <div
+          style={{
+            width: '64px',
+            height: '64px',
+            borderRadius: '50%',
+            backgroundColor: 'color-mix(in srgb, var(--color-accent) 12%, transparent)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 20px auto',
+          }}
+          aria-hidden="true"
+        >
+          <AlertCircleIcon size={32} color="var(--color-accent)" />
         </div>
         <h1
           style={{

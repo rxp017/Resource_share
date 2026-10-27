@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './useAuth';
 
+import { ClockIcon } from '../../shared/components/Icons';
+
 export const VerifyPendingPage: React.FC = () => {
   const { user, refreshMembership, signOut } = useAuth();
   const navigate = useNavigate();
@@ -45,9 +47,8 @@ export const VerifyPendingPage: React.FC = () => {
           alignItems: 'center',
           justifyContent: 'center',
           margin: '0 auto 20px auto',
-          fontSize: '24px'
         }}>
-          ⏳
+          <ClockIcon size={28} strokeWidth={1.75} />
         </div>
 
         <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '12px' }}>
