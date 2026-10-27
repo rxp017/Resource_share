@@ -27,19 +27,29 @@ export const ExplorePage: React.FC = () => {
 
   // Filter states
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedMode, setSelectedMode] = useState<string>('all');
   const [maxSalePriceRupees, setMaxSalePriceRupees] = useState<string>('');
   const [maxRentalDailyRupees, setMaxRentalDailyRupees] = useState<string>('');
   const [fetchTrigger, setFetchTrigger] = useState<number>(0);
 
+  // 300ms debounce on search input to prevent query flooding
   useEffect(() => {
-    let isMounted = true;
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+      setIsLoading(true);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    let isCancelled = false;
 
     async function load() {
       try {
         const filters = {
-          query: searchQuery,
+          query: debouncedSearchQuery.trim() || undefined,
           category: selectedCategory !== 'all' ? (selectedCategory as ListingCategory) : undefined,
           mode: selectedMode !== 'all' ? selectedMode : undefined,
           maxPricePaise:
@@ -49,6 +59,8 @@ export const ExplorePage: React.FC = () => {
         };
 
         const data = await fetchPublishedListings(filters);
+
+        if (isCancelled) return;
 
         let filtered = data;
         if (maxRentalDailyRupees && Number(maxRentalDailyRupees) > 0) {
@@ -61,17 +73,17 @@ export const ExplorePage: React.FC = () => {
           });
         }
 
-        if (isMounted) {
+        if (!isCancelled) {
           setListings(filtered);
           setErrorMessage(null);
         }
       } catch (err: unknown) {
-        if (isMounted) {
+        if (!isCancelled) {
           const msg = err instanceof Error ? err.message : 'Failed loading marketplace listings.';
           setErrorMessage(msg);
         }
       } finally {
-        if (isMounted) {
+        if (!isCancelled) {
           setIsLoading(false);
         }
       }
@@ -79,22 +91,25 @@ export const ExplorePage: React.FC = () => {
 
     load();
     return () => {
-      isMounted = false;
+      isCancelled = true;
     };
-  }, [selectedCategory, selectedMode, maxRentalDailyRupees, maxSalePriceRupees, searchQuery, fetchTrigger]);
+  }, [selectedCategory, selectedMode, maxRentalDailyRupees, maxSalePriceRupees, debouncedSearchQuery, fetchTrigger]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setDebouncedSearchQuery(searchQuery);
     setFetchTrigger((t) => t + 1);
   };
 
   const handleResetFilters = () => {
     setSearchQuery('');
+    setDebouncedSearchQuery('');
     setSelectedCategory('all');
     setSelectedMode('all');
     setMaxSalePriceRupees('');
     setMaxRentalDailyRupees('');
+    setIsLoading(true);
   };
 
   return (
@@ -168,6 +183,8 @@ export const ExplorePage: React.FC = () => {
                 type="button"
                 onClick={() => {
                   setSearchQuery('');
+                  setDebouncedSearchQuery('');
+                  setIsLoading(true);
                   setFetchTrigger((t) => t + 1);
                 }}
                 className="interactive-btn"
