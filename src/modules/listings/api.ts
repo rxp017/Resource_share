@@ -44,7 +44,8 @@ export async function fetchPublishedListings(filters: ListingFilters = {}): Prom
       updated_at
     `)
     .eq('status', 'published')
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
+    .limit(30);
 
   if (filters.category && filters.category !== 'all') {
     query = query.eq('category', filters.category);
@@ -85,7 +86,7 @@ export async function fetchPublishedListings(filters: ListingFilters = {}): Prom
     .in('listing_id', listingIds)
     .order('sort_order', { ascending: true });
 
-  // Map media to listings and resolve thumbnail signed URLs
+  // Map media to listings
   const mediaByListing = new Map<string, ListingMediaItem[]>();
   if (mediaRows) {
     for (const m of mediaRows) {
@@ -95,20 +96,48 @@ export async function fetchPublishedListings(filters: ListingFilters = {}): Prom
     }
   }
 
-  // For the first photo of each listing, get a signed URL
-  const enriched: ListingItem[] = await Promise.all(
-    listings.map(async (l) => {
-      const media = mediaByListing.get(l.id) || [];
-      if (media.length > 0) {
-        const signed = await getListingPhotoSignedUrl(media[0].storage_path);
-        media[0].signed_url = signed || undefined;
+  // Batch sign thumbnail URLs with a single storage API call (avoids N+1 waterfalls)
+  const pathsToSign: string[] = [];
+  for (const l of listings) {
+    const media = mediaByListing.get(l.id) || [];
+    if (media.length > 0 && media[0].storage_path) {
+      pathsToSign.push(media[0].storage_path);
+    }
+  }
+
+  const signedUrlMap = new Map<string, string>();
+  if (pathsToSign.length > 0) {
+    try {
+      const { data: signedData } = await supabase.storage
+        .from('listing-photos')
+        .createSignedUrls(pathsToSign, 3600);
+
+      if (signedData) {
+        for (const item of signedData) {
+          if (item && item.path && item.signedUrl && !item.error) {
+            signedUrlMap.set(item.path, item.signedUrl);
+          }
+        }
       }
-      return {
-        ...l,
-        media,
-      };
-    })
-  );
+    } catch (e) {
+      console.warn('Batch signed URL generation failed:', e);
+    }
+  }
+
+  const enriched: ListingItem[] = listings.map((l) => {
+    const media = mediaByListing.get(l.id) || [];
+    if (media.length > 0) {
+      const firstPath = media[0].storage_path;
+      const signed = signedUrlMap.get(firstPath);
+      if (signed) {
+        media[0].signed_url = signed;
+      }
+    }
+    return {
+      ...l,
+      media,
+    };
+  });
 
   return enriched;
 }
