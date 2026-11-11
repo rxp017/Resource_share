@@ -521,4 +521,4 @@ export async function updateListing(
       }
     }
   }
-        }
+}
