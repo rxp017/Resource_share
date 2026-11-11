@@ -94,6 +94,7 @@ export const InboxPage: React.FC = () => {
         </div>
       ) : (
         <div
+          className={id ? 'inbox-grid thread-open' : 'inbox-grid'}
           style={{
             display: 'grid',
             gridTemplateColumns: 'minmax(280px, 340px) 1fr',
@@ -108,6 +109,7 @@ export const InboxPage: React.FC = () => {
         >
           {/* Conversation List */}
           <div
+            className="inbox-list"
             style={{
               borderRight: '1px solid var(--color-border)',
               overflowY: 'auto',
@@ -183,7 +185,7 @@ export const InboxPage: React.FC = () => {
           </div>
 
           {/* Active Chat Thread */}
-          <div style={{ padding: '16px', display: 'flex', flexDirection: 'column' }}>
+          <div className="inbox-thread" style={{ padding: '16px', display: 'flex', flexDirection: 'column' }}>
             {activeTxId ? (
               <div>
                 <div
@@ -197,6 +199,21 @@ export const InboxPage: React.FC = () => {
                   }}
                 >
                   <div>
+                    <button
+                      onClick={() => navigate('/inbox')}
+                      className="interactive-btn inbox-back"
+                      style={{
+                        fontSize: '0.8rem',
+                        color: 'var(--color-accent)',
+                        background: 'none',
+                        border: 'none',
+                        padding: '4px 8px 4px 0',
+                        cursor: 'pointer',
+                        fontWeight: 700,
+                      }}
+                    >
+                      ← All conversations
+                    </button>
                     <span style={{ fontWeight: 800, fontSize: '1.05rem', color: 'var(--color-text)' }}>
                       {activeConvo?.listing_title}
                     </span>
