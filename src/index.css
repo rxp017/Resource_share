@@ -248,8 +248,8 @@ html[data-motion="reduced"] *::after {
     gap: 2px !important;
   }
   .desktop-nav .nav-link {
-    padding: 8px 8px !important;
-    gap: 5px !important;
+    padding: 8px 6px !important;
+    gap: 4px !important;
     font-size: 0.85rem !important;
   }
 }
@@ -496,4 +496,10 @@ input:focus, textarea:focus, select:focus {
 .inbox-list, .inbox-thread { min-width: 0; }
 .inbox-list[role="button"]:focus-visible, .inbox-list [role="button"]:focus-visible {
   outline: 3px solid var(--color-accent); outline-offset: -3px;
+}
+
+@media (max-width: 360px) {
+  .header-mobile { padding-left: 12px !important; padding-right: 12px !important; }
+  .header-mobile > div { gap: 6px !important; }
+  .header-mobile > div:first-child > a { font-size: 1rem !important; gap: 6px !important; }
 }
