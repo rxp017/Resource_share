@@ -181,7 +181,7 @@ export const PublicLandingPage: React.FC = () => {
           />
         </div>
 
-        {/* Official Trust Badge */}
+        {/* Trust Badge */}
         <div
           className="magic-glow"
           style={{
@@ -202,7 +202,7 @@ export const PublicLandingPage: React.FC = () => {
           }}
         >
           <ShieldCheckIcon size={16} strokeWidth={2.2} style={{ flexShrink: 0 }} />
-          <span>Official Peer Network for HITAM College</span>
+          <span>Peer-to-Peer Resource Sharing for HITAM Students</span>
         </div>
 
         <h1
