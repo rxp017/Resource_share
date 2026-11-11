@@ -20,7 +20,7 @@ export interface TrustProfile {
   role: string;
   completed_count: number;
   review_count: number;
-  avg_rating: number;
+  avg_rating: number | null;
   is_newcomer: boolean;
   member_since?: string;
 }
