@@ -29,14 +29,35 @@ export const MembersManagementPage: React.FC = () => {
 
     async function loadMembers() {
       try {
+        // NOTE: no embedded join (profile:profiles!user_id) - the live schema has no
+        // FK from memberships.user_id to profiles.id, so PostgREST rejects it (PGRST200).
+        // Fetch profiles in a second query and join client-side instead.
         const { data, error } = await supabase
           .from('memberships')
-          .select('*, profile:profiles!user_id(display_name)')
+          .select('*')
           .order('created_at', { ascending: false });
 
         if (error) throw error;
+        const rows = (data || []) as MemberRecord[];
+        const userIds = [...new Set(rows.map((m) => m.user_id).filter(Boolean))];
+        const nameById = new Map<string, string>();
+        if (userIds.length > 0) {
+          const { data: profiles, error: profilesError } = await supabase
+            .from('profiles')
+            .select('id, display_name')
+            .in('id', userIds);
+          if (profilesError) throw profilesError;
+          for (const p of profiles || []) {
+            if (p?.id) nameById.set(p.id, p.display_name || 'HITAM Student');
+          }
+        }
         if (isMounted) {
-          setMembers((data || []) as MemberRecord[]);
+          setMembers(
+            rows.map((m) => ({
+              ...m,
+              profile: { display_name: nameById.get(m.user_id) || 'HITAM Student' },
+            }))
+          );
         }
       } catch (err: unknown) {
         console.warn('Error fetching members:', err);
