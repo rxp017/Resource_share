@@ -104,7 +104,7 @@ export const AppLayout: React.FC = () => {
                 boxShadow: '0 2px 6px rgba(0,0,0,0.12)',
               }}
             />
-            <span style={{ letterSpacing: '-0.02em' }}>HITAM Share</span>
+            <span style={{ letterSpacing: '-0.02em', whiteSpace: 'nowrap' }}>HITAM Share</span>
           </Link>
           <span
             style={{
