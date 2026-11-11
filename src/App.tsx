@@ -1,6 +1,6 @@
 // src/App.tsx
-import React, { useMemo } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import React, { useMemo, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, useLocation, useNavigationType } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
   AuthProvider,
@@ -34,6 +34,15 @@ import { MembersManagementPage } from './modules/admin/MembersManagementPage';
 import { PublicLandingPage } from './modules/landing/PublicLandingPage';
 import { NotFoundPage, ErrorBoundary } from './shared/components';
 
+function ScrollToTop() {
+  const { pathname, hash } = useLocation();
+  const navigationType = useNavigationType();
+  useEffect(() => {
+    if (navigationType !== 'POP' && !hash) window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, [pathname, hash, navigationType]);
+  return null;
+}
+
 export const App: React.FC = () => {
   const queryClient = useMemo(
     () =>
@@ -51,6 +60,7 @@ export const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
+        <ScrollToTop />
         <AuthProvider onSignOutCleanup={() => queryClient.clear()}>
           <ThemeProvider>
             <ErrorBoundary>
