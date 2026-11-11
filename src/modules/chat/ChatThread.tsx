@@ -299,6 +299,7 @@ export const ChatThread: React.FC<ChatThreadProps> = ({
               color: 'var(--color-text)',
               cursor: 'pointer',
               whiteSpace: 'nowrap',
+              flexShrink: 0,
             }}
           >
             {prompt}
