@@ -103,4 +103,4 @@ export async function fetchConversations(currentUserId: string): Promise<Convers
     console.warn('fetchConversations error:', err);
     return [];
   }
-        }
+}
