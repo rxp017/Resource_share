@@ -217,6 +217,37 @@ html[data-motion="reduced"] *::after {
   .mobile-bottom-nav {
     display: flex !important;
   }
+  .inbox-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .inbox-grid.thread-open .inbox-list {
+    display: none !important;
+  }
+  .inbox-grid:not(.thread-open) .inbox-thread {
+    display: none !important;
+  }
+  .inbox-back {
+    display: inline-flex !important;
+  }
+}
+
+.inbox-back {
+  display: none;
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .header-mobile {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+  .desktop-nav {
+    gap: 2px !important;
+  }
+  .desktop-nav .nav-link {
+    padding: 8px 8px !important;
+    gap: 5px !important;
+    font-size: 0.85rem !important;
+  }
 }
 
 @media (min-width: 1024px) {

@@ -131,7 +131,7 @@ export const AppLayout: React.FC = () => {
             <NavLink
               key={item.to}
               to={item.to}
-              className="interactive-btn"
+              className="interactive-btn nav-link"
               style={({ isActive }) => ({
                 display: 'flex',
                 alignItems: 'center',
