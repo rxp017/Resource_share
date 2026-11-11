@@ -196,9 +196,6 @@ html[data-motion="reduced"] *::after {
 
 /* Responsive Layout Breakpoints */
 @media (min-width: 768px) {
-  .desktop-campus-name {
-    display: inline !important;
-  }
   .desktop-nav {
     display: flex !important;
   }
@@ -219,6 +216,13 @@ html[data-motion="reduced"] *::after {
   }
   .mobile-bottom-nav {
     display: flex !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .desktop-campus-name {
+    display: inline !important;
+    white-space: nowrap;
   }
 }
 
