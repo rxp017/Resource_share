@@ -97,7 +97,7 @@ export const InboxPage: React.FC = () => {
           className={id ? 'inbox-grid thread-open' : 'inbox-grid'}
           style={{
             display: 'grid',
-            gridTemplateColumns: 'minmax(280px, 340px) 1fr',
+            gridTemplateColumns: 'minmax(240px, 340px) minmax(0, 1fr)',
             gap: '16px',
             backgroundColor: 'var(--color-surface)',
             border: '1px solid var(--color-border)',
@@ -147,6 +147,15 @@ export const InboxPage: React.FC = () => {
               return (
                 <div
                   key={c.transaction_id}
+                  role="button"
+                  tabIndex={0}
+                  aria-pressed={isSelected}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      navigate(`/inbox/${c.transaction_id}`);
+                    }
+                  }}
                   onClick={() => navigate(`/inbox/${c.transaction_id}`)}
                   className="interactive-card"
                   style={{
@@ -238,7 +247,7 @@ export const InboxPage: React.FC = () => {
                     View Exchange Record →
                   </button>
                 </div>
-                <ChatThread transactionId={activeTxId} counterpartName={activeConvo?.counterpart_name} maxHeight="450px" />
+                <ChatThread key={activeTxId} transactionId={activeTxId} counterpartName={activeConvo?.counterpart_name} maxHeight="450px" />
               </div>
             ) : (
               <div style={{ margin: 'auto', textAlign: 'center', color: 'var(--color-text-muted)', padding: '40px' }}>
