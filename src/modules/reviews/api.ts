@@ -60,17 +60,33 @@ interface ReviewRow extends ReviewItem {
 
 export async function fetchReviewsForUser(userId: string): Promise<ReviewItem[]> {
   try {
+    // NOTE: no embedded join (reviewer:profiles!reviewer_id) - the live schema has no
+    // FK from reviews.reviewer_id to profiles.id, so PostgREST rejects it (PGRST200).
+    // Fetch reviewer display names in a second query and join client-side instead.
     const { data, error } = await supabase
       .from('reviews')
-      .select('*, reviewer:profiles!reviewer_id(display_name)')
+      .select('*')
       .eq('reviewee_id', userId)
       .eq('is_published', true)
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-    return ((data || []) as unknown as ReviewRow[]).map((r) => ({
+    const rows = (data || []) as unknown as ReviewRow[];
+    const reviewerIds = [...new Set(rows.map((r) => r.reviewer_id).filter(Boolean))];
+    const nameById = new Map<string, string>();
+    if (reviewerIds.length > 0) {
+      const { data: reviewers, error: reviewersError } = await supabase
+        .from('profiles')
+        .select('id, display_name')
+        .in('id', reviewerIds);
+      if (reviewersError) throw reviewersError;
+      for (const p of reviewers || []) {
+        if (p?.id) nameById.set(p.id, p.display_name || 'Anonymous Student');
+      }
+    }
+    return rows.map((r) => ({
       ...r,
-      reviewer_name: r.reviewer?.display_name || 'Anonymous Student',
+      reviewer_name: nameById.get(r.reviewer_id) || 'Anonymous Student',
     }));
   } catch (err: unknown) {
     console.warn('fetchReviewsForUser failed:', err);
