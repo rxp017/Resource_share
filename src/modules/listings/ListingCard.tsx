@@ -113,6 +113,25 @@ export const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
         >
           {getModeLabel()}
         </span>
+
+        {listing.is_demo && (
+          <span
+            style={{
+              position: 'absolute',
+              top: '12px',
+              right: '12px',
+              backgroundColor: 'color-mix(in srgb, var(--color-accent) 12%, var(--color-surface))',
+              color: 'var(--color-accent)',
+              border: '1px solid var(--color-accent)',
+              fontSize: '0.7rem',
+              fontWeight: 800,
+              padding: '3px 10px',
+              borderRadius: '9999px',
+            }}
+          >
+            Demo
+          </span>
+        )}
       </div>
 
       {/* Content */}
