@@ -218,7 +218,11 @@ html[data-motion="reduced"] *::after {
     display: flex !important;
   }
   .inbox-grid {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  .inbox-grid .inbox-list,
+  .inbox-grid .inbox-thread {
+    min-width: 0 !important;
   }
   .inbox-grid.thread-open .inbox-list {
     display: none !important;
