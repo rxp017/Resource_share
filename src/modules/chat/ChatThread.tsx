@@ -382,6 +382,7 @@ export const ChatThread: React.FC<ChatThreadProps> = ({
           maxLength={1000}
           style={{
             flex: 1,
+            minWidth: 0,
             padding: '10px 14px',
             borderRadius: '8px',
             border: '1px solid var(--color-border)',
@@ -398,6 +399,8 @@ export const ChatThread: React.FC<ChatThreadProps> = ({
           className="interactive-btn"
           style={{
             padding: '10px 20px',
+            flexShrink: 0,
+            whiteSpace: 'nowrap',
             backgroundColor: 'var(--color-accent)',
             color: 'var(--color-accent-contrast)',
             border: 'none',
