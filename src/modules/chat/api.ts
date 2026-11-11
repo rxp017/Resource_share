@@ -13,10 +13,9 @@ export async function fetchMessages(transactionId: string): Promise<MessageItem[
     if (error) throw error;
     return (data || []) as MessageItem[];
   } catch (err: unknown) {
-    console.warn('fetchMessages fallback:', err);
-    // Local storage fallback for seamless testing
-    const stored = localStorage.getItem('messages_' + transactionId);
-    return stored ? JSON.parse(stored) : [];
+    console.warn('fetchMessages failed:', err);
+    // Fail honestly: never replay localStorage as if it were chat history.
+    throw err;
   }
 }
 
@@ -36,29 +35,9 @@ export async function sendMessage(
     if (error) throw error;
     return data as MessageItem;
   } catch (err: unknown) {
-    console.warn('send_chat_message RPC fallback:', err);
-    // Direct insert attempt
-    const { data: userData } = await supabase.auth.getUser();
-    const userId = userData.user?.id || 'anon';
-    const { data: tx } = await supabase.from('transactions').select('owner_id, requester_id').eq('id', transactionId).single();
-    const recipientId = tx?.owner_id === userId ? tx?.requester_id : tx?.owner_id;
-
-    const mockMsg: MessageItem = {
-      id: 'local_' + Date.now(),
-      transaction_id: transactionId,
-      sender_id: userId,
-      recipient_id: recipientId || 'other',
-      content: content.trim(),
-      client_msg_id: msgId,
-      created_at: new Date().toISOString(),
-    };
-
-    const stored = localStorage.getItem('messages_' + transactionId);
-    const list: MessageItem[] = stored ? JSON.parse(stored) : [];
-    list.push(mockMsg);
-    localStorage.setItem('messages_' + transactionId, JSON.stringify(list));
-
-    return mockMsg;
+    console.warn('send_chat_message RPC failed:', err);
+    // Fail honestly: a message that only exists locally must never look sent.
+    throw new Error('Message could not be delivered right now. Please try again.', { cause: err });
   }
 }
 
@@ -86,7 +65,20 @@ export async function fetchConversations(currentUserId: string): Promise<Convers
     if (error) throw error;
     if (!txs) return [];
 
-    return (txs as unknown as TransactionRecord[]).map((tx) => {
+    const records = txs as unknown as TransactionRecord[];
+    const counterpartIds = [...new Set(records.map((tx) => (tx.owner_id === currentUserId ? tx.requester_id : tx.owner_id)))];
+    let nameById = new Map<string, string>();
+    if (counterpartIds.length > 0) {
+      const { data: profileRows } = await supabase
+        .from('profiles')
+        .select('id, display_name')
+        .in('id', counterpartIds);
+      nameById = new Map<string, string>(
+        (profileRows || []).map((p: { id: string; display_name?: string }) => [p.id, p.display_name || 'HITAM Student'] as [string, string])
+      );
+    }
+
+    return records.map((tx) => {
       const isOwner = tx.owner_id === currentUserId;
       const counterpartId = isOwner ? tx.requester_id : tx.owner_id;
       // Get any stored messages
@@ -100,7 +92,7 @@ export async function fetchConversations(currentUserId: string): Promise<Convers
         transaction_id: tx.id,
         listing_title: listingData?.title || 'Campus Item',
         counterpart_id: counterpartId,
-        counterpart_name: isOwner ? 'Student Requester' : 'Student Owner',
+        counterpart_name: nameById.get(counterpartId) || 'HITAM Student',
         last_message: lastMsg?.content || 'No messages yet',
         last_message_at: lastMsg?.created_at,
         unread_count: 0,
@@ -111,4 +103,4 @@ export async function fetchConversations(currentUserId: string): Promise<Convers
     console.warn('fetchConversations error:', err);
     return [];
   }
-}
+        }
