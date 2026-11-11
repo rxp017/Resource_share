@@ -10,6 +10,7 @@ export const NotificationsPage: React.FC = () => {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [filter, setFilter] = useState<'all' | 'unread'>('all');
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -22,6 +23,9 @@ export const NotificationsPage: React.FC = () => {
         }
       } catch (e: unknown) {
         console.warn('Could not load notifications:', e);
+        if (isMounted) {
+          setLoadError('Notifications could not be loaded right now. Please try again later.');
+        }
       } finally {
         if (isMounted) {
           setLoading(false);
@@ -89,6 +93,23 @@ export const NotificationsPage: React.FC = () => {
           </button>
         )}
       </div>
+
+      {loadError && (
+        <div
+          role="alert"
+          style={{
+            padding: '10px 14px',
+            marginBottom: '16px',
+            borderRadius: '8px',
+            border: '1px solid var(--color-warning-border, #fde68a)',
+            backgroundColor: 'var(--color-warning-surface, #fefce8)',
+            color: 'var(--color-text)',
+            fontSize: '0.85rem',
+          }}
+        >
+          {loadError}
+        </div>
+      )}
 
       {/* Tabs */}
       <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', borderBottom: '1px solid var(--color-border)', paddingBottom: '10px' }}>

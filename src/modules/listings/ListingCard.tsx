@@ -113,11 +113,30 @@ export const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
         >
           {getModeLabel()}
         </span>
+
+        {listing.is_demo && (
+          <span
+            style={{
+              position: 'absolute',
+              top: '12px',
+              right: '12px',
+              backgroundColor: 'color-mix(in srgb, var(--color-accent) 12%, var(--color-surface))',
+              color: 'var(--color-accent)',
+              border: '1px solid var(--color-accent)',
+              fontSize: '0.7rem',
+              fontWeight: 800,
+              padding: '3px 10px',
+              borderRadius: '9999px',
+            }}
+          >
+            Demo
+          </span>
+        )}
       </div>
 
       {/* Content */}
       <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
           <span
             style={{
               fontSize: '0.7rem',
@@ -125,6 +144,10 @@ export const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
               letterSpacing: '0.06em',
               color: 'var(--color-accent)',
               textTransform: 'uppercase',
+              minWidth: 0,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
             }}
           >
             {formatCategory(listing.category)}
@@ -139,6 +162,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
               padding: '2px 8px',
               borderRadius: '4px',
               border: '1px solid var(--color-border)',
+              flexShrink: 0,
             }}
           >
             {listing.condition.replace('_', ' ')}
@@ -170,7 +194,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
           }}
         >
           <MapPinIcon size={14} style={{ color: 'var(--color-accent)', flexShrink: 0 }} />
-          <span>{listing.pickup_zone || 'HITAM Campus Pickup'}</span>
+          <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{listing.pickup_zone || 'HITAM Campus Pickup'}</span>
         </p>
 
         {/* Exchange Strip */}
@@ -179,6 +203,8 @@ export const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '6px',
             paddingTop: '12px',
             borderTop: '1px solid var(--color-border)',
           }}
@@ -188,6 +214,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
               fontWeight: 800,
               fontSize: '1.15rem',
               color: 'var(--color-accent)',
+              minWidth: 0,
             }}
           >
             {formatPrice()}
@@ -202,6 +229,8 @@ export const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
               padding: '2px 8px',
               borderRadius: '9999px',
               border: '1px solid var(--color-success)',
+              flexShrink: 0,
+              marginLeft: 'auto',
             }}
           >
             ● Available

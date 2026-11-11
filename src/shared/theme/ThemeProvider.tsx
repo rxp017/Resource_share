@@ -56,11 +56,19 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return defaultPreferences;
   });
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [isLoadingPreferences, setIsLoadingPreferences] = useState<boolean>(!!user);
+  // Derive the loading flag synchronously from the user the server preferences
+  // were loaded for. A flag toggled inside the effect leaves a one-commit gap
+  // where OnboardingGuard can read stale default preferences and bounce a
+  // signed-in member to /onboarding.
+  const [prefsLoadedFor, setPrefsLoadedFor] = useState<string | null>(null);
+  const isLoadingPreferences = !!user && prefsLoadedFor !== user.id;
 
   // Fetch preferences from Supabase when user is authenticated
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setPrefsLoadedFor(null);
+      return;
+    }
 
     let isMounted = true;
     async function loadServerPreferences() {
@@ -91,7 +99,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         console.error('Error loading preferences:', err);
       } finally {
         if (isMounted) {
-          setIsLoadingPreferences(false);
+          setPrefsLoadedFor(user!.id);
         }
       }
     }

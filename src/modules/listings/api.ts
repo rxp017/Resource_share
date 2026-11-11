@@ -10,7 +10,8 @@ import type {
 import { resizeAndStripExif, uploadListingPhoto, getListingPhotoSignedUrl } from './imageUtils';
 import { CAMPUS_SEED_LISTINGS } from './seedCatalog';
 
-export const HITAM_CAMPUS_ID = 'c0000000-0000-0000-0000-000000000001';
+export { HITAM_CAMPUS_ID } from './seedCatalog';
+import { HITAM_CAMPUS_ID } from './seedCatalog';
 
 export const CAMPUS_PICKUP_ZONES = [
   'Library Entrance',
@@ -215,6 +216,19 @@ export async function fetchListingById(listingId: string): Promise<ListingItem |
       return null;
     }
 
+  // Fetch the owner's public profile for display ("Listed by ...")
+  let ownerName: string | null = null;
+  try {
+    const { data: ownerProfile } = await supabase
+      .from('profiles')
+      .select('display_name')
+      .eq('id', listing.owner_id)
+      .maybeSingle();
+    ownerName = ownerProfile?.display_name || null;
+  } catch (e) {
+    console.warn('Owner profile lookup failed:', e);
+  }
+
   // Fetch all media
   const { data: mediaRows } = await supabase
     .from('listing_media')
@@ -235,6 +249,7 @@ export async function fetchListingById(listingId: string): Promise<ListingItem |
 
     return {
       ...listing,
+      owner_name: ownerName,
       media,
     };
   } catch {

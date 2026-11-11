@@ -8,8 +8,7 @@ export async function fetchTrustProfile(userId: string): Promise<TrustProfile> {
     if (error) throw error;
     return data as TrustProfile;
   } catch (err: unknown) {
-    console.warn('get_trust_profile fallback:', err);
-    // Calculate from direct tables or fallback
+    console.warn('get_trust_profile RPC unavailable, using base profile data only:', err);
     const { data: profile } = await supabase.from('profiles').select('display_name, avatar_url').eq('id', userId).single();
     const { data: m } = await supabase.from('memberships').select('role, created_at').eq('user_id', userId).single();
     const { count: completedCount } = await supabase
@@ -25,7 +24,7 @@ export async function fetchTrustProfile(userId: string): Promise<TrustProfile> {
       role: m?.role || 'student',
       completed_count: completedCount || 0,
       review_count: 0,
-      avg_rating: 5.0,
+      avg_rating: null, // honest: no rating data without the trust profile RPC
       is_newcomer: (completedCount || 0) < 3,
       member_since: m?.created_at,
     };
@@ -47,33 +46,9 @@ export async function submitReview(
     if (error) throw error;
     return data;
   } catch (err: unknown) {
-    console.warn('submit_review fallback:', err);
-    const { data: userData } = await supabase.auth.getUser();
-    const userId = userData.user?.id || 'anon';
-    const { data: tx } = await supabase.from('transactions').select('owner_id, requester_id').eq('id', transactionId).single();
-    const revieweeId = tx?.owner_id === userId ? tx?.requester_id : tx?.owner_id;
-
-    const mockReview: ReviewItem = {
-      id: 'rev_' + Date.now(),
-      transaction_id: transactionId,
-      reviewer_id: userId,
-      reviewee_id: revieweeId || 'other',
-      rating,
-      comment: comment.trim(),
-      is_published: true,
-      created_at: new Date().toISOString(),
-    };
-
-    const stored = localStorage.getItem('reviews_' + revieweeId);
-    const list: ReviewItem[] = stored ? JSON.parse(stored) : [];
-    list.push(mockReview);
-    localStorage.setItem('reviews_' + revieweeId, JSON.stringify(list));
-
-    return {
-      success: true,
-      review_id: mockReview.id,
-      message: 'Review submitted successfully!',
-    };
+    console.warn('submit_review RPC failed:', err);
+    // Fail honestly: a review that is only stored locally must never look submitted.
+    throw new Error('Review could not be submitted right now. Please try again.', { cause: err });
   }
 }
 
@@ -98,9 +73,8 @@ export async function fetchReviewsForUser(userId: string): Promise<ReviewItem[]>
       reviewer_name: r.reviewer?.display_name || 'Anonymous Student',
     }));
   } catch (err: unknown) {
-    console.warn('fetchReviewsForUser fallback:', err);
-    const stored = localStorage.getItem('reviews_' + userId);
-    return stored ? JSON.parse(stored) : [];
+    console.warn('fetchReviewsForUser failed:', err);
+    throw err;
   }
 }
 
@@ -119,12 +93,8 @@ export async function reportDispute(
     if (error) throw error;
     return data;
   } catch (err: unknown) {
-    console.warn('report_dispute fallback:', err);
-    return {
-      success: true,
-      dispute_id: 'disp_' + Date.now(),
-      message: 'Dispute recorded and queued for campus moderator review.',
-    };
+    console.warn('report_dispute RPC failed:', err);
+    throw new Error('Dispute could not be recorded right now. Please try again.', { cause: err });
   }
 }
 
@@ -143,8 +113,8 @@ export async function resolveDispute(
     if (error) throw error;
     return data;
   } catch (err: unknown) {
-    console.warn('resolve_dispute fallback:', err);
-    return { success: true, status: resolution === 'dismiss' ? 'dismissed' : 'resolved' };
+    console.warn('resolve_dispute RPC failed:', err);
+    throw new Error('Dispute could not be updated right now. Please try again.', { cause: err });
   }
 }
 

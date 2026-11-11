@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, Outlet, Link } from 'react-router-dom';
 import { useAuth } from '../../modules/auth/useAuth';
+import { useTheme } from '../theme';
 import { fetchNotifications } from '../../modules/notifications/api';
 import {
   SearchIcon,
@@ -12,10 +13,13 @@ import {
   BellIcon,
   SettingsIcon,
   GoogleIcon,
+  SunIcon,
+  MoonIcon,
 } from '../components/Icons';
 
 export const AppLayout: React.FC = () => {
   const { user } = useAuth();
+  const { appearance, updatePreferences } = useTheme();
   const [unreadCount, setUnreadCount] = useState<number>(0);
 
   useEffect(() => {
@@ -100,7 +104,7 @@ export const AppLayout: React.FC = () => {
                 boxShadow: '0 2px 6px rgba(0,0,0,0.12)',
               }}
             />
-            <span style={{ letterSpacing: '-0.02em' }}>HITAM Share</span>
+            <span style={{ letterSpacing: '-0.02em', whiteSpace: 'nowrap' }}>HITAM Share</span>
           </Link>
           <span
             style={{
@@ -152,6 +156,32 @@ export const AppLayout: React.FC = () => {
 
         {/* Actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {/* Quick Light/Dark Toggle */}
+          <button
+            type="button"
+            className="interactive-btn"
+            onClick={() => void updatePreferences({ appearance: appearance === 'dark' ? 'light' : 'dark' })}
+            aria-label={`Switch to ${appearance === 'dark' ? 'light' : 'dark'} mode`}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              minHeight: '40px',
+              minWidth: '40px',
+              borderRadius: 'var(--radius-btn, 8px)',
+              border: '1px solid var(--color-border)',
+              backgroundColor: 'var(--color-surface)',
+              color: 'var(--color-text)',
+              cursor: 'pointer',
+              padding: 0,
+            }}
+          >
+            {appearance === 'dark' ? (
+              <SunIcon size={18} strokeWidth={2} />
+            ) : (
+              <MoonIcon size={18} strokeWidth={2} />
+            )}
+          </button>
           {user ? (
             <>
               {/* Active Notifications Link with Badge */}

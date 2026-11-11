@@ -231,6 +231,30 @@ export const ListingDetailPage: React.FC = () => {
             {listing.title}
           </h1>
 
+          {listing.is_demo && (
+            <div
+              style={{
+                display: 'inline-block',
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                padding: '3px 10px',
+                borderRadius: '9999px',
+                backgroundColor: 'color-mix(in srgb, var(--color-accent) 12%, var(--color-surface))',
+                color: 'var(--color-accent)',
+                border: '1px solid var(--color-accent)',
+                marginBottom: '12px',
+              }}
+            >
+              Demo listing - sample campus catalog entry
+            </div>
+          )}
+
+          {listing.owner_name && (
+            <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginTop: 0, marginBottom: '12px' }}>
+              Listed by {listing.owner_name}
+            </p>
+          )}
+
           {/* Pricing Box */}
           <div
             style={{
@@ -308,17 +332,17 @@ export const ListingDetailPage: React.FC = () => {
             <div
               style={{
                 padding: '12px 16px',
-                border: '1px solid #fed7aa',
+                border: '1px solid var(--color-warning-border, #fed7aa)',
                 borderRadius: '6px',
-                backgroundColor: '#fffbeb',
+                backgroundColor: 'var(--color-warning-surface, #fffbeb)',
                 marginBottom: '20px',
                 fontSize: '0.875rem',
               }}
             >
-              <strong style={{ color: '#b45309', display: 'block', marginBottom: '2px' }}>
+              <strong style={{ color: 'var(--color-warning, #b45309)', display: 'block', marginBottom: '2px' }}>
                 Reported Wear & Defects:
               </strong>
-              <p style={{ color: '#78350f' }}>{listing.defects}</p>
+              <p style={{ color: 'var(--color-text)' }}>{listing.defects}</p>
             </div>
           )}
 

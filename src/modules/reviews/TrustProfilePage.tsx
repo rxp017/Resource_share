@@ -125,7 +125,11 @@ export const TrustProfilePage: React.FC = () => {
               Campus Reliability & Trust Index
             </span>
             <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--color-accent)' }}>
-              {profile.completed_count >= 5 ? '98% Top Rated' : profile.completed_count > 0 ? '92% Reliable' : '100% In Good Standing'}
+              {profile.review_count > 0 && profile.avg_rating != null
+                ? `Rated ${profile.avg_rating} / 5 from ${profile.review_count} review${profile.review_count === 1 ? '' : 's'}`
+                : profile.completed_count > 0
+                  ? `${profile.completed_count} completed exchange${profile.completed_count === 1 ? '' : 's'} - no ratings yet`
+                  : 'New member - no ratings yet'}
             </span>
           </div>
           <div
@@ -139,7 +143,7 @@ export const TrustProfilePage: React.FC = () => {
           >
             <div
               style={{
-                width: profile.completed_count >= 5 ? '98%' : profile.completed_count > 0 ? '92%' : '100%',
+                width: profile.review_count > 0 && profile.avg_rating != null ? `${(profile.avg_rating / 5) * 100}%` : '0%',
                 height: '100%',
                 background: 'linear-gradient(90deg, var(--color-accent), #10b981)',
                 borderRadius: '999px',

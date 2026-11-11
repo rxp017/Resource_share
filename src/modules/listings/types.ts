@@ -48,6 +48,8 @@ export interface ListingItem {
   pickup_zone: string;
   created_at: string;
   updated_at: string;
+  is_demo?: boolean;
+  owner_name?: string | null;
   media?: ListingMediaItem[];
   owner_email?: string;
 }

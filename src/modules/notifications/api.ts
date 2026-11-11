@@ -17,21 +17,10 @@ export async function fetchNotifications(unreadOnly = false): Promise<Notificati
     if (error) throw error;
     return (data || []) as NotificationItem[];
   } catch (err: unknown) {
-    console.warn('fetchNotifications fallback:', err);
-    const stored = localStorage.getItem('notifications_feed');
-    const list: NotificationItem[] = stored ? JSON.parse(stored) : [
-      {
-        id: 'sample_notif_1',
-        user_id: 'current',
-        title: 'Welcome to HITAM Resource Share',
-        body: 'Browse campus listings or publish your own textbooks, lab gear, and calculators.',
-        entity_type: 'system',
-        entity_id: 'system',
-        is_read: false,
-        created_at: new Date().toISOString(),
-      },
-    ];
-    return unreadOnly ? list.filter((n) => !n.is_read) : list;
+    console.warn('fetchNotifications failed:', err);
+    // Fail honestly: never fabricate sample notifications or replay
+    // localStorage as if it were the real notification feed.
+    throw err;
   }
 }
 
@@ -40,13 +29,8 @@ export async function markNotificationRead(id: string): Promise<void> {
     const { error } = await supabase.from('notifications').update({ is_read: true }).eq('id', id);
     if (error) throw error;
   } catch (err: unknown) {
-    console.warn('markNotificationRead fallback:', err);
-    const stored = localStorage.getItem('notifications_feed');
-    if (stored) {
-      const list: NotificationItem[] = JSON.parse(stored);
-      const updated = list.map((n) => (n.id === id ? { ...n, is_read: true } : n));
-      localStorage.setItem('notifications_feed', JSON.stringify(updated));
-    }
+    console.warn('markNotificationRead failed:', err);
+    throw err;
   }
 }
 
@@ -55,12 +39,7 @@ export async function markAllNotificationsRead(): Promise<void> {
     const { error } = await supabase.from('notifications').update({ is_read: true }).eq('is_read', false);
     if (error) throw error;
   } catch (err: unknown) {
-    console.warn('markAllNotificationsRead fallback:', err);
-    const stored = localStorage.getItem('notifications_feed');
-    if (stored) {
-      const list: NotificationItem[] = JSON.parse(stored);
-      const updated = list.map((n) => ({ ...n, is_read: true }));
-      localStorage.setItem('notifications_feed', JSON.stringify(updated));
-    }
+    console.warn('markAllNotificationsRead failed:', err);
+    throw err;
   }
 }

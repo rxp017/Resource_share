@@ -41,6 +41,7 @@ export const ChatThread: React.FC<ChatThreadProps> = ({
       try {
         const list = await fetchMessages(transactionId);
         if (isMounted) {
+          setLoadError(null);
           setMessages((prev) => {
             if (prev.length === list.length) {
               const unchanged = prev.every((m, idx) => m.id === list[idx]?.id);
@@ -51,6 +52,9 @@ export const ChatThread: React.FC<ChatThreadProps> = ({
         }
       } catch (e: unknown) {
         console.warn('Could not poll chat messages:', e);
+        if (isMounted) {
+          setLoadError('Messages could not be loaded right now.');
+        }
       }
     }
 
@@ -89,6 +93,7 @@ export const ChatThread: React.FC<ChatThreadProps> = ({
 
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [sendError, setSendError] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const QUICK_PROMPTS = [
     'Central Library Gate 2',
@@ -300,6 +305,23 @@ export const ChatThread: React.FC<ChatThreadProps> = ({
           </button>
         ))}
       </div>
+
+      {loadError && (
+        <div
+          role="alert"
+          style={{
+            margin: '0 16px 8px',
+            padding: '10px 14px',
+            borderRadius: '8px',
+            border: '1px solid var(--color-warning-border, #fde68a)',
+            backgroundColor: 'var(--color-warning-surface, #fefce8)',
+            color: 'var(--color-text)',
+            fontSize: '0.85rem',
+          }}
+        >
+          {loadError}
+        </div>
+      )}
 
       {/* Inline Send Error Banner with Retry */}
       {sendError && (

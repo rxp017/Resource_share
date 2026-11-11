@@ -44,30 +44,9 @@ export async function createHandoffSession(
     if (error) throw error;
     return data;
   } catch (err: unknown) {
-    // Graceful client fallback if RPC not yet deployed
-    console.warn('create_handoff_session RPC fallback:', err);
-    const mockToken = 'rs_qr_' + Math.random().toString(36).substring(2, 15);
-    const mockCode = Math.random().toString(36).substring(2, 12).toUpperCase();
-    const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
-    const session = {
-      id: 'session_' + Date.now(),
-      transaction_id: transactionId,
-      phase,
-      token: mockToken,
-      fallback_code: mockCode,
-      expires_at: expiresAt,
-      condition_summary: conditionSummary,
-      condition_notes: conditionNotes,
-      status: 'active',
-    };
-    sessionStorage.setItem('active_handoff_' + transactionId + '_' + phase, JSON.stringify(session));
-    return {
-      success: true,
-      session_id: session.id,
-      token: mockToken,
-      fallback_code: mockCode,
-      expires_at: expiresAt,
-    };
+    console.warn('create_handoff_session RPC failed:', err);
+    // Fail honestly: a fabricated QR session would manufacture fake handoffs.
+    throw new Error('Handoff session could not be created right now. Please try again.', { cause: err });
   }
 }
 
@@ -86,27 +65,9 @@ export async function redeemHandoffChallenge(
     if (error) throw error;
     return data;
   } catch (err: unknown) {
-    console.warn('redeem_handoff_challenge RPC fallback:', err);
-    // Check fallback in sessionStorage
-    const stored = sessionStorage.getItem('active_handoff_' + transactionId + '_' + phase);
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      if (
-        tokenOrCode.trim().toLowerCase() === parsed.token.toLowerCase() ||
-        tokenOrCode.trim().toUpperCase() === parsed.fallback_code.toUpperCase()
-      ) {
-        parsed.status = 'redeemed';
-        sessionStorage.setItem('active_handoff_' + transactionId + '_' + phase, JSON.stringify(parsed));
-        return {
-          success: true,
-          session_id: parsed.id,
-          condition_summary: parsed.condition_summary,
-          condition_notes: parsed.condition_notes,
-          message: 'Code verified! Inspect condition and confirm physical handoff.',
-        };
-      }
-    }
-    throw new Error('Invalid code or token. Please check and try again.', { cause: err });
+    console.warn('redeem_handoff_challenge RPC failed:', err);
+    // Fail honestly: never verify a code against a client-side fabricated session.
+    throw new Error('Code verification is unavailable right now. Please try again.', { cause: err });
   }
 }
 
@@ -129,23 +90,8 @@ export async function finalizeHandoff(
     if (error) throw error;
     return data;
   } catch (err: unknown) {
-    console.warn('finalize_handoff RPC fallback:', err);
-    // Direct update fallback
-    const { data: tx } = await supabase.from('transactions').select('*').eq('id', transactionId).single();
-    let newStatus = 'completed';
-    if (tx) {
-      if (tx.mode === 'sale') {
-        newStatus = 'completed';
-      } else if (tx.status === 'in_progress' || tx.status === 'seller_acknowledged') {
-        newStatus = tx.status === 'in_progress' ? (conditionAgreed ? 'completed' : 'returned_pending_resolution') : 'in_progress';
-      }
-      await supabase.from('transactions').update({ status: newStatus }).eq('id', transactionId);
-    }
-    return {
-      success: true,
-      finalized: true,
-      status: newStatus,
-      message: 'Handoff successfully confirmed and finalized!',
-    };
+    console.warn('finalize_handoff RPC failed:', err);
+    // Fail honestly: never mark an exchange completed via a client-side direct update.
+    throw new Error('Handoff could not be finalized right now. Please try again.', { cause: err });
   }
 }

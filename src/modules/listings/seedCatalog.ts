@@ -1,6 +1,7 @@
 // src/modules/listings/seedCatalog.ts
 import type { ListingItem } from './types';
-import { HITAM_CAMPUS_ID } from './api';
+// HITAM_CAMPUS_ID lives here (not api.ts) to avoid a circular import: api.ts imports CAMPUS_SEED_LISTINGS from this module.
+export const HITAM_CAMPUS_ID = 'c0000000-0000-0000-0000-000000000001';
 
 export const CAMPUS_SEED_LISTINGS: ListingItem[] = [
   {
@@ -22,6 +23,7 @@ export const CAMPUS_SEED_LISTINGS: ListingItem[] = [
     created_at: new Date(Date.now() - 3600000 * 4).toISOString(),
     updated_at: new Date(Date.now() - 3600000 * 4).toISOString(),
     media: [],
+    is_demo: true,
   },
   {
     id: 'seed-book-002',
@@ -42,6 +44,7 @@ export const CAMPUS_SEED_LISTINGS: ListingItem[] = [
     created_at: new Date(Date.now() - 3600000 * 12).toISOString(),
     updated_at: new Date(Date.now() - 3600000 * 12).toISOString(),
     media: [],
+    is_demo: true,
   },
   {
     id: 'seed-draft-003',
@@ -62,6 +65,7 @@ export const CAMPUS_SEED_LISTINGS: ListingItem[] = [
     created_at: new Date(Date.now() - 3600000 * 18).toISOString(),
     updated_at: new Date(Date.now() - 3600000 * 18).toISOString(),
     media: [],
+    is_demo: true,
   },
   {
     id: 'seed-coat-004',
@@ -82,6 +86,7 @@ export const CAMPUS_SEED_LISTINGS: ListingItem[] = [
     created_at: new Date(Date.now() - 3600000 * 24).toISOString(),
     updated_at: new Date(Date.now() - 3600000 * 24).toISOString(),
     media: [],
+    is_demo: true,
   },
   {
     id: 'seed-iot-005',
@@ -102,6 +107,7 @@ export const CAMPUS_SEED_LISTINGS: ListingItem[] = [
     created_at: new Date(Date.now() - 3600000 * 30).toISOString(),
     updated_at: new Date(Date.now() - 3600000 * 30).toISOString(),
     media: [],
+    is_demo: true,
   },
   {
     id: 'seed-code-006',
@@ -122,5 +128,6 @@ export const CAMPUS_SEED_LISTINGS: ListingItem[] = [
     created_at: new Date(Date.now() - 3600000 * 48).toISOString(),
     updated_at: new Date(Date.now() - 3600000 * 48).toISOString(),
     media: [],
+    is_demo: true,
   },
 ];
