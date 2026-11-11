@@ -76,7 +76,7 @@ export const ExplorePage: React.FC = () => {
           category: selectedCategory !== 'all' ? (selectedCategory as ListingCategory) : undefined,
           mode: selectedMode !== 'all' ? selectedMode : undefined,
           maxPricePaise:
-            selectedMode === 'sale' && maxSalePriceRupees
+            selectedMode === 'sale' && maxSalePriceRupees !== ''
               ? Math.round(Number(maxSalePriceRupees) * 100)
               : undefined,
         };
@@ -86,7 +86,11 @@ export const ExplorePage: React.FC = () => {
         if (isCancelled) return;
 
         let filtered = data;
-        if (maxRentalDailyRupees && Number(maxRentalDailyRupees) > 0) {
+        if (maxSalePriceRupees !== '' && Number(maxSalePriceRupees) >= 0) {
+          const maxSalePaise = Math.round(Number(maxSalePriceRupees) * 100);
+          filtered = filtered.filter((item) => item.mode !== 'sale' || item.price_paise <= maxSalePaise);
+        }
+        if (maxRentalDailyRupees !== '' && Number(maxRentalDailyRupees) >= 0) {
           const maxDailyPaise = Math.round(Number(maxRentalDailyRupees) * 100);
           filtered = filtered.filter((item) => {
             if (item.mode === 'rental') {

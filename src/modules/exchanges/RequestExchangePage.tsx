@@ -73,6 +73,14 @@ export const RequestExchangePage: React.FC = () => {
     );
   }
 
+  if (listing.id.startsWith('seed-')) {
+    return <div style={{ maxWidth: '640px', margin: '0 auto', padding: '32px 16px' }}>
+      <h1>Demo listing only</h1>
+      <p style={{ margin: '16px 0' }}>This sample cannot be requested. Choose a live student listing to start an exchange.</p>
+      <Link to="/explore">Browse live listings</Link>
+    </div>;
+  }
+
   const isOwner = user?.id === listing.owner_id;
   if (isOwner) {
     return (
@@ -399,12 +407,23 @@ export const RequestExchangePage: React.FC = () => {
             Exchange Summary
           </h4>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '0.875rem' }}>
-            <span style={{ color: 'var(--color-text-muted)' }}>Agreed Total Amount</span>
+            <span style={{ color: 'var(--color-text-muted)' }}>{listing.mode === 'sale' ? 'Item price' : 'Exchange fee (excluding deposit)'}</span>
             <span style={{ fontWeight: 800 }}>
               {listing.mode === 'free_loan' ? '₹0.00 (Free)' : `₹${(totalQuotePaise / 100).toFixed(2)}`}
             </span>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem' }}>
+          {listing.mode !== 'sale' && <>
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', marginBottom: '6px', fontSize: '0.875rem' }}>
+              <span>Refundable security deposit</span>
+              <strong>₹{((listing.deposit_paise || 0) / 100).toFixed(2)}</strong>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', marginBottom: '6px', fontSize: '0.875rem' }}>
+              <span>Fee + deposit</span>
+              <strong>₹{((totalQuotePaise + (listing.deposit_paise || 0)) / 100).toFixed(2)}</strong>
+            </div>
+            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem', marginBottom: '12px' }}>Deposit terms are shown on the listing. Settle directly with the owner; no online payment is collected here.</p>
+          </>}
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', fontSize: '0.875rem' }}>
             <span style={{ color: 'var(--color-text-muted)' }}>Designated Campus Zone</span>
             <span>{listing.pickup_zone || 'HITAM Campus'}</span>
           </div>

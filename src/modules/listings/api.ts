@@ -67,7 +67,7 @@ export async function fetchPublishedListings(filters: ListingFilters = {}): Prom
       if (filters.minPricePaise !== undefined && filters.minPricePaise > 0) {
         query = query.gte('price_paise', filters.minPricePaise);
       }
-      if (filters.maxPricePaise !== undefined && filters.maxPricePaise > 0) {
+      if (filters.maxPricePaise !== undefined && filters.maxPricePaise >= 0) {
         query = query.lte('price_paise', filters.maxPricePaise);
       }
 
@@ -164,7 +164,7 @@ export async function fetchPublishedListings(filters: ListingFilters = {}): Prom
     fallbackListings = fallbackListings.filter((item) => item.price_paise >= filters.minPricePaise!);
   }
 
-  if (filters.maxPricePaise !== undefined && filters.maxPricePaise > 0) {
+  if (filters.maxPricePaise !== undefined && filters.maxPricePaise >= 0) {
     fallbackListings = fallbackListings.filter((item) => item.price_paise <= filters.maxPricePaise!);
   }
 
@@ -521,4 +521,4 @@ export async function updateListing(
       }
     }
   }
-}
+         }

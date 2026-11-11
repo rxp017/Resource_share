@@ -355,7 +355,9 @@ export const ListingDetailPage: React.FC = () => {
           </div>
 
           {/* Action CTA */}
-          {isOwner ? (
+          {listing.id.startsWith('seed-') ? (
+            <p role="note">Demo only. This sample is not available for requests.</p>
+          ) : isOwner ? (
             <div
               style={{
                 padding: '16px',

@@ -359,7 +359,7 @@ export const PublicLandingPage: React.FC = () => {
           },
           {
             label: 'Visual Contrast & A11y',
-            value: 'WCAG 2.1 AA Passed',
+            value: 'Accessibility Controls',
             icon: <CheckCircleIcon size={20} strokeWidth={2} />,
           },
         ].map((stat, i) => (

@@ -29,6 +29,9 @@ interface RawTransactionRow {
 export async function createExchangeRequest(
   payload: CreateExchangeRequestPayload
 ): Promise<{ success: boolean; transaction_id: string; status: string; quoted_price_paise: number }> {
+  if (payload.listingId.startsWith('seed-')) {
+    throw new Error('Demo listings cannot be requested.');
+  }
   const { data, error } = await supabase.rpc('request_exchange', {
     p_listing_id: payload.listingId,
     p_start_date: payload.startDate || null,
