@@ -131,6 +131,142 @@ export const AppLayout: React.FC = () => {
             <NavLink
               key={item.to}
               to={item.to}
+import React, { useState, useEffect } from 'react';
+import { NavLink, Outlet, Link } from 'react-router-dom';
+import { useAuth } from '../../modules/auth/useAuth';
+import { useTheme } from '../theme';
+import { fetchNotifications } from '../../modules/notifications/api';
+import {
+  SearchIcon,
+  RefreshCwIcon,
+  PlusCircleIcon,
+  MessageSquareIcon,
+  UserIcon,
+  BellIcon,
+  SettingsIcon,
+  GoogleIcon,
+  SunIcon,
+  MoonIcon,
+} from '../components/Icons';
+
+export const AppLayout: React.FC = () => {
+  const { user } = useAuth();
+  const { appearance, updatePreferences } = useTheme();
+  const resolvedAppearance: 'light' | 'dark' =
+    appearance === 'system'
+      ? (typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+      : appearance;
+  const [unreadCount, setUnreadCount] = useState<number>(0);
+
+  useEffect(() => {
+    let isMounted = true;
+    if (!user) return;
+
+    async function checkUnread() {
+      try {
+        const notifs = await fetchNotifications(true);
+        if (isMounted) {
+          setUnreadCount(notifs.filter((n) => !n.is_read).length);
+        }
+      } catch (err: unknown) {
+        console.warn('Could not poll unread notifications count:', err);
+      }
+    }
+
+    void checkUnread();
+    const interval = setInterval(() => {
+      void checkUnread();
+    }, 15000);
+
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, [user]);
+
+  const navItems = [
+    { to: '/explore', label: 'Explore', icon: <SearchIcon size={18} strokeWidth={2} /> },
+    { to: '/exchanges', label: 'Exchanges', icon: <RefreshCwIcon size={18} strokeWidth={2} /> },
+    { to: '/listings/new', label: 'Create', icon: <PlusCircleIcon size={18} strokeWidth={2} /> },
+    { to: '/inbox', label: 'Inbox', icon: <MessageSquareIcon size={18} strokeWidth={2} /> },
+    { to: '/profile', label: 'Profile', icon: <UserIcon size={18} strokeWidth={2} /> },
+  ];
+
+  return (
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
+
+      {/* Glassmorphic Sticky Header */}
+      <header
+        role="banner"
+        className="glass-panel header-mobile"
+        style={{
+          padding: '10px 20px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          position: 'sticky',
+          top: 0,
+          zIndex: 100,
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          borderBottom: '1px solid var(--color-border)',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <Link
+            to="/explore"
+            style={{
+              textDecoration: 'none',
+              fontWeight: 800,
+              fontSize: '1.15rem',
+              color: 'var(--color-text)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              minHeight: '44px',
+            }}
+          >
+            <img
+              src="/hitam-logo.png"
+              alt="HITAM Logo"
+              style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '8px',
+                objectFit: 'cover',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.12)',
+              }}
+            />
+            <span style={{ letterSpacing: '-0.02em', whiteSpace: 'nowrap' }}>HITAM Share</span>
+          </Link>
+          <span
+            style={{
+              fontSize: '0.75rem',
+              color: 'var(--color-text-muted)',
+              borderLeft: '1px solid var(--color-border)',
+              paddingLeft: '12px',
+              display: 'none',
+            }}
+            className="desktop-campus-name"
+          >
+            Hyderabad Institute of Technology and Management
+          </span>
+        </div>
+
+        {/* Desktop Navigation */}
+        <nav
+          role="navigation"
+          aria-label="Desktop primary navigation"
+          style={{ display: 'flex', gap: '6px', alignItems: 'center' }}
+          className="desktop-nav"
+        >
+          {navItems.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
               className="interactive-btn nav-link"
               style={({ isActive }) => ({
                 display: 'flex',
@@ -160,8 +296,8 @@ export const AppLayout: React.FC = () => {
           <button
             type="button"
             className="interactive-btn"
-            onClick={() => void updatePreferences({ appearance: appearance === 'dark' ? 'light' : 'dark' })}
-            aria-label={`Switch to ${appearance === 'dark' ? 'light' : 'dark'} mode`}
+            onClick={() => void updatePreferences({ appearance: resolvedAppearance === 'dark' ? 'light' : 'dark' })}
+            aria-label={`Switch to ${resolvedAppearance === 'dark' ? 'light' : 'dark'} mode`}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -176,7 +312,7 @@ export const AppLayout: React.FC = () => {
               padding: 0,
             }}
           >
-            {appearance === 'dark' ? (
+            {resolvedAppearance === 'dark' ? (
               <SunIcon size={18} strokeWidth={2} />
             ) : (
               <MoonIcon size={18} strokeWidth={2} />
