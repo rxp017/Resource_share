@@ -20,6 +20,10 @@ import {
 export const AppLayout: React.FC = () => {
   const { user } = useAuth();
   const { appearance, updatePreferences } = useTheme();
+  const resolvedAppearance: 'light' | 'dark' =
+    appearance === 'system'
+      ? (typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+      : appearance;
   const [unreadCount, setUnreadCount] = useState<number>(0);
 
   useEffect(() => {
@@ -160,8 +164,8 @@ export const AppLayout: React.FC = () => {
           <button
             type="button"
             className="interactive-btn"
-            onClick={() => void updatePreferences({ appearance: appearance === 'dark' ? 'light' : 'dark' })}
-            aria-label={`Switch to ${appearance === 'dark' ? 'light' : 'dark'} mode`}
+            onClick={() => void updatePreferences({ appearance: resolvedAppearance === 'dark' ? 'light' : 'dark' })}
+            aria-label={`Switch to ${resolvedAppearance === 'dark' ? 'light' : 'dark'} mode`}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -176,7 +180,7 @@ export const AppLayout: React.FC = () => {
               padding: 0,
             }}
           >
-            {appearance === 'dark' ? (
+            {resolvedAppearance === 'dark' ? (
               <SunIcon size={18} strokeWidth={2} />
             ) : (
               <MoonIcon size={18} strokeWidth={2} />

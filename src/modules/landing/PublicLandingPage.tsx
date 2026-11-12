@@ -21,6 +21,10 @@ import {
 export const PublicLandingPage: React.FC = () => {
   const { user, membership } = useAuth();
   const { appearance, updatePreferences } = useTheme();
+  const resolvedAppearance: 'light' | 'dark' =
+    appearance === 'system'
+      ? (typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+      : appearance;
 
   return (
     <main
@@ -77,8 +81,8 @@ export const PublicLandingPage: React.FC = () => {
           <button
             type="button"
             className="interactive-btn"
-            onClick={() => void updatePreferences({ appearance: appearance === 'dark' ? 'light' : 'dark' })}
-            aria-label={`Switch to ${appearance === 'dark' ? 'light' : 'dark'} mode`}
+            onClick={() => void updatePreferences({ appearance: resolvedAppearance === 'dark' ? 'light' : 'dark' })}
+            aria-label={`Switch to ${resolvedAppearance === 'dark' ? 'light' : 'dark'} mode`}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -93,7 +97,7 @@ export const PublicLandingPage: React.FC = () => {
               padding: 0,
             }}
           >
-            {appearance === 'dark' ? (
+            {resolvedAppearance === 'dark' ? (
               <SunIcon size={16} strokeWidth={2} />
             ) : (
               <MoonIcon size={16} strokeWidth={2} />

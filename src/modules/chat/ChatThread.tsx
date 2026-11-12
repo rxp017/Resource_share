@@ -337,7 +337,7 @@ export const ChatThread: React.FC<ChatThreadProps> = ({
             justifyContent: 'space-between',
             gap: '8px',
             fontSize: '0.8rem',
-            color: '#b91c1c',
+            color: 'var(--color-danger)',
           }}
         >
           <span>⚠️ {sendError}</span>
@@ -348,7 +348,7 @@ export const ChatThread: React.FC<ChatThreadProps> = ({
             style={{
               background: 'none',
               border: 'none',
-              color: '#b91c1c',
+              color: 'var(--color-danger)',
               textDecoration: 'underline',
               fontWeight: 700,
               cursor: isSending || !inputText.trim() ? 'not-allowed' : 'pointer',
