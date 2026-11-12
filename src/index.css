@@ -15,6 +15,7 @@
 html[data-style="pulse"][data-appearance="light"] {
   --color-bg: #FAF6EF;
   --color-surface: #FFFFFF;
+  --color-surface-subtle: #F1EAE0;
   --color-text: #201A17;
   --color-text-muted: #6B6259;
   --color-border: #E7DFD3;
@@ -36,6 +37,7 @@ html[data-style="pulse"][data-appearance="light"] {
 html[data-style="pulse"][data-appearance="dark"] {
   --color-bg: #201A17;
   --color-surface: #2A2320;
+  --color-surface-subtle: #26201B;
   --color-text: #F5EFE6;
   --color-text-muted: #B3A79A;
   --color-border: #453B33;
@@ -58,6 +60,7 @@ html[data-style="calm"][data-appearance="light"],
 html:not([data-style]) {
   --color-bg: #F5F6F7;
   --color-surface: #FFFFFF;
+  --color-surface-subtle: #EBEEF1;
   --color-text: #2F3A45;
   --color-text-muted: #5D6B7A;
   --color-border: #DFE3E8;
@@ -79,6 +82,7 @@ html:not([data-style]) {
 html[data-style="calm"][data-appearance="dark"] {
   --color-bg: #10161D;
   --color-surface: #1A222B;
+  --color-surface-subtle: #161D26;
   --color-text: #E6EBF0;
   --color-text-muted: #9AA7B4;
   --color-border: #33404D;
