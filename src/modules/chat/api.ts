@@ -78,13 +78,26 @@ export async function fetchConversations(currentUserId: string): Promise<Convers
       );
     }
 
+    // Latest message per conversation, straight from the database.
+    // (Never localStorage: thread history lives in Supabase, so a stale
+    // local cache would show "No messages yet" for active chats.)
+    const lastMsgByTx = new Map<string, Pick<MessageItem, 'content' | 'created_at'>>();
+    const txIds = records.map((tx) => tx.id);
+    if (txIds.length > 0) {
+      const { data: msgRows } = await supabase
+        .from('messages')
+        .select('transaction_id, content, created_at')
+        .in('transaction_id', txIds)
+        .order('created_at', { ascending: false });
+      for (const m of (msgRows || []) as Pick<MessageItem, 'transaction_id' | 'content' | 'created_at'>[]) {
+        if (!lastMsgByTx.has(m.transaction_id)) lastMsgByTx.set(m.transaction_id, m);
+      }
+    }
+
     return records.map((tx) => {
       const isOwner = tx.owner_id === currentUserId;
       const counterpartId = isOwner ? tx.requester_id : tx.owner_id;
-      // Get any stored messages
-      const stored = localStorage.getItem('messages_' + tx.id);
-      const msgs: MessageItem[] = stored ? JSON.parse(stored) : [];
-      const lastMsg = msgs.length > 0 ? msgs[msgs.length - 1] : undefined;
+      const lastMsg = lastMsgByTx.get(tx.id);
 
       const listingData = Array.isArray(tx.listing) ? tx.listing[0] : tx.listing;
 
